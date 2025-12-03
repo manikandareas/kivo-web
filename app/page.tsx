@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import { HeroSection, ExploreSection } from '@/features/landing';
 import type { Idea } from '@/features/landing';
 import Image from 'next/image';
+import { authClient } from '@/lib/auth-client';
 
 // Sample idea data for initial render
 const sampleIdeas: Idea[] = [
@@ -54,6 +55,8 @@ export default function Home() {
     console.log('Idea selected:', idea);
   };
 
+  const { data } = authClient.useSession();
+  console.log(data);
   return (
     <div className="min-h-screen bg-background">
       <header className="w-full border-b ">
@@ -61,6 +64,7 @@ export default function Home() {
           <Image src={'/logo.svg'} width={100} height={40} alt="Kivo" />
         </div>
       </header>
+      <p className="text-red-500">{data?.user.email}</p>
       <HeroSection
         onSendMessage={handleSendMessage}
         onExploreClick={handleExploreClick}
