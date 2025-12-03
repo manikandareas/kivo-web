@@ -1,42 +1,15 @@
 'use client';
 
-import type { Idea } from '@/features/landing';
+import type { Bmc } from '@/features/landing';
 import {
-  ExploreSection,
+  BmcExploreSection,
   FloatingGlobeButton,
   Header,
   HeroSection,
 } from '@/features/landing';
+import { dummyBmcs } from '@/features/shared/constants/dummy-bmc';
 import { useRouter } from 'next/navigation';
 import { useRef } from 'react';
-
-// Sample idea data for initial render
-const sampleIdeas: Idea[] = [
-  {
-    id: '1',
-    title: 'Aplikasi Kesehatan',
-    description: 'Tracking kesehatan harian dan reminder minum obat',
-    category: 'Health',
-  },
-  {
-    id: '2',
-    title: 'E-Commerce Lokal',
-    description: 'Platform jual beli produk UMKM sekitar',
-    category: 'Business',
-  },
-  {
-    id: '3',
-    title: 'Belajar Bahasa',
-    description: 'Aplikasi belajar bahasa dengan AI tutor',
-    category: 'Education',
-  },
-  {
-    id: '4',
-    title: 'Smart Home',
-    description: 'Kontrol perangkat rumah dari smartphone',
-    category: 'IoT',
-  },
-];
 
 export default function Home() {
   const exploreSectionRef = useRef<HTMLDivElement>(null);
@@ -51,9 +24,9 @@ export default function Home() {
     exploreSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleIdeaClick = (idea: Idea) => {
-    // TODO: Implement idea selection (e.g., populate chat input or navigate)
-    console.log('Idea selected:', idea);
+  const handleBmcClick = (bmc: Bmc) => {
+    // TODO: Implement BMC selection (e.g., navigate to BMC detail)
+    console.log('BMC selected:', bmc);
   };
 
   const handleGlobeClick = () => {
@@ -76,7 +49,7 @@ export default function Home() {
           onExploreClick={handleExploreClick}
         />
         <div ref={exploreSectionRef}>
-          <ExploreSection ideas={sampleIdeas} onIdeaClick={handleIdeaClick} />
+          <BmcExploreSection bmcs={dummyBmcs} onBmcClick={handleBmcClick} />
         </div>
       </div>
 
