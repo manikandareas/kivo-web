@@ -1,9 +1,13 @@
 'use client';
 
 import { useRef } from 'react';
-import { HeroSection, ExploreSection } from '@/features/landing';
+import {
+  HeroSection,
+  ExploreSection,
+  Header,
+  FloatingGlobeButton,
+} from '@/features/landing';
 import type { Idea } from '@/features/landing';
-import Image from 'next/image';
 import { authClient } from '@/lib/auth-client';
 
 // Sample idea data for initial render
@@ -57,14 +61,15 @@ export default function Home() {
 
   const { data } = authClient.useSession();
   console.log(data);
+
+  const handleGlobeClick = () => {
+    // TODO: Implement globe button action
+    console.log('Globe button clicked');
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      <header className="w-full border-b ">
-        <div className=" mx-auto p-6 w-full">
-          <Image src={'/logo.svg'} width={100} height={40} alt="Kivo" />
-        </div>
-      </header>
-      <p className="text-red-500">{data?.user.email}</p>
+      <Header />
       <HeroSection
         onSendMessage={handleSendMessage}
         onExploreClick={handleExploreClick}
@@ -72,6 +77,7 @@ export default function Home() {
       <div ref={exploreSectionRef}>
         <ExploreSection ideas={sampleIdeas} onIdeaClick={handleIdeaClick} />
       </div>
+      <FloatingGlobeButton onClick={handleGlobeClick} />
     </div>
   );
 }

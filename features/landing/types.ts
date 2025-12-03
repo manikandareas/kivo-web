@@ -13,8 +13,11 @@ export interface Idea {
   id: string;
   title: string;
   description?: string;
-  icon?: string;
   category?: string;
+  thumbnail?: string;
+  author?: string;
+  overlayTitle?: string;
+  overlaySubtitle?: string;
 }
 
 // Component Props

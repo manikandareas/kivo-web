@@ -3,6 +3,7 @@
 import { Send } from 'lucide-react';
 import { motion } from 'motion/react';
 import type { ChatInputProps } from '../types';
+import { Button } from '@/features/shared';
 
 export function ChatInput({
   value,
@@ -25,21 +26,21 @@ export function ChatInput({
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         rows={5}
-        className="w-full resize-none rounded-[var(--radius)] border border-border bg-input p-4 pr-14 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+        className="w-full resize-none rounded border border-border bg-input p-4 pr-14 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
         data-testid="chat-input-textarea"
       />
-      <motion.button
+      <Button
         type="button"
         onClick={onSend}
-        whileHover={{ scale: 1.05 }}
-        className="absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-[var(--radius)] bg-primary text-primary-foreground transition-colors hover:bg-primary/90"
+        className="absolute bottom-3 right-3"
         data-testid="chat-input-send-button"
         aria-label="Send message"
+        size={'sm'}
       >
         <motion.span whileHover={{ rotate: 15 }}>
-          <Send className="h-5 w-5" />
+          <Send className="size-3" />
         </motion.span>
-      </motion.button>
+      </Button>
     </div>
   );
 }

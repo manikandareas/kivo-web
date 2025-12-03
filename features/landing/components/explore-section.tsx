@@ -20,10 +20,7 @@ const itemVariants = {
 export function ExploreSection({ ideas, onIdeaClick }: ExploreSectionProps) {
   if (ideas.length === 0) {
     return (
-      <section
-        className="container-landing py-12"
-        data-testid="explore-section"
-      >
+      <section className="container py-12" data-testid="explore-section">
         <h2 className="mb-6 text-xl font-semibold text-foreground">
           Explore ide disekitarmu
         </h2>
@@ -33,7 +30,7 @@ export function ExploreSection({ ideas, onIdeaClick }: ExploreSectionProps) {
   }
 
   return (
-    <section className="container-landing py-12" data-testid="explore-section">
+    <section className="container py-12" data-testid="explore-section">
       <h2 className="mb-6 text-xl font-semibold text-foreground">
         Explore ide disekitarmu
       </h2>
