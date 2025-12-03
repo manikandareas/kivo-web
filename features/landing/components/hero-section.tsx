@@ -1,6 +1,9 @@
 'use client';
 
-import { Suggestion, Suggestions } from '@/components/ai-elements/suggestion';
+import {
+  Suggestion,
+  Suggestions,
+} from '@/features/shared/components/ai-elements/suggestion';
 import { Chat } from '@/features/chat';
 import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
 import { generateUUID } from '@/lib/utils';

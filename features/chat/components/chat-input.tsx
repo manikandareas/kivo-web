@@ -8,7 +8,7 @@ import {
   PromptInputSubmit,
   PromptInputButton,
   type PromptInputMessage,
-} from '@/components/ai-elements/prompt-input';
+} from '@/features/shared/components/ai-elements/prompt-input';
 import { cn } from '@/lib/utils';
 import type { ChatStatus } from 'ai';
 import { SquareIcon } from 'lucide-react';

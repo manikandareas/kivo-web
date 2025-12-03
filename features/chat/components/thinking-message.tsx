@@ -3,8 +3,8 @@
 import {
   Message as AIMessage,
   MessageContent,
-} from '@/components/ai-elements/message';
-import { Loader } from '@/components/ai-elements/loader';
+} from '@/features/shared/components/ai-elements/message';
+import { Loader } from '@/features/shared/components/ai-elements/loader';
 import { cn } from '@/lib/utils';
 import { BotIcon } from 'lucide-react';
 
