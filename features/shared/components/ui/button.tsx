@@ -20,7 +20,7 @@ const buttonVariants = cva(
         accent:
           'bg-accent text-accent-foreground hover:brightness-110 border-b-[4px] border-b-[oklch(0.55_0.18_51)] shadow-md dark:border-b-[oklch(0.62_0.15_63)]',
         ghost:
-          'text-foreground hover:bg-muted hover:text-accent-foreground border-transparent shadow-none',
+          'text-foreground hover:bg-muted/80 hover:text-foreground border-transparent shadow-none',
         link: 'text-primary underline-offset-4 hover:underline border-transparent shadow-none',
       },
       size: {
