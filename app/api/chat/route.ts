@@ -7,10 +7,6 @@
 
 import { convertToModelMessages, streamText, UIMessage } from 'ai';
 import { getModel } from '@/lib/ai/providers';
-import { getSystemPrompt } from '@/lib/ai/prompts';
-import { validateChatRequest } from '@/lib/ai/validation';
-import { truncateMessages } from '@/lib/ai/messages';
-import type { ChatMessage } from '@/lib/ai/validation';
 
 /**
  * Error response helper

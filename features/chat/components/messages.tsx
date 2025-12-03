@@ -4,7 +4,7 @@ import {
   Conversation,
   ConversationContent,
   ConversationScrollButton,
-} from '@/components/ai-elements/conversation';
+} from '@/features/shared/components/ai-elements/conversation';
 import { memo, useEffect, useRef } from 'react';
 import type { ChatMessageWithParts } from '../types';
 import { Message } from './message';

@@ -4,12 +4,12 @@ import {
   Message as AIMessage,
   MessageContent,
   MessageResponse,
-} from '@/components/ai-elements/message';
+} from '@/features/shared/components/ai-elements/message';
 import {
   Reasoning,
   ReasoningContent,
   ReasoningTrigger,
-} from '@/components/ai-elements/reasoning';
+} from '@/features/shared/components/ai-elements/reasoning';
 import { cn } from '@/lib/utils';
 import { BotIcon } from 'lucide-react';
 import { memo } from 'react';
