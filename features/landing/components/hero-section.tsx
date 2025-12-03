@@ -6,6 +6,7 @@ import { ChatInput } from './chat-input';
 import type { HeroSectionProps } from '../types';
 import { Button } from '@/features/shared/components/ui/button';
 import { Suggestion, Suggestions } from '@/components/ai-elements/suggestion';
+import { AnimatedBadge } from './animated-badge';
 
 const containerVariants = {
   hidden: { opacity: 0 },

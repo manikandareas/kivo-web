@@ -5,3 +5,7 @@ export { ExploreSection } from './explore-section';
 export { IdeaCard } from './idea-card';
 export { Header } from './header';
 export { FloatingGlobeButton } from './floating-globe-button';
+export { FloatingShapes } from './floating-shapes';
+export { SparkleEffect } from './sparkle-effect';
+export { GradientBlob } from './gradient-blob';
+export { AnimatedBadge } from './animated-badge';

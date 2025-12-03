@@ -6,6 +6,10 @@ import {
   ExploreSection,
   Header,
   FloatingGlobeButton,
+  FloatingShapes,
+  SparkleEffect,
+  GradientBlob,
+  AnimatedBadge,
 } from '@/features/landing';
 import type { Idea } from '@/features/landing';
 import { authClient } from '@/lib/auth-client';
@@ -16,28 +20,24 @@ const sampleIdeas: Idea[] = [
     id: '1',
     title: 'Aplikasi Kesehatan',
     description: 'Tracking kesehatan harian dan reminder minum obat',
-    icon: '💊',
     category: 'Health',
   },
   {
     id: '2',
     title: 'E-Commerce Lokal',
     description: 'Platform jual beli produk UMKM sekitar',
-    icon: '🛒',
     category: 'Business',
   },
   {
     id: '3',
     title: 'Belajar Bahasa',
     description: 'Aplikasi belajar bahasa dengan AI tutor',
-    icon: '📚',
     category: 'Education',
   },
   {
     id: '4',
     title: 'Smart Home',
     description: 'Kontrol perangkat rumah dari smartphone',
-    icon: '🏠',
     category: 'IoT',
   },
 ];
@@ -68,15 +68,25 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <HeroSection
-        onSendMessage={handleSendMessage}
-        onExploreClick={handleExploreClick}
-      />
-      <div ref={exploreSectionRef}>
-        <ExploreSection ideas={sampleIdeas} onIdeaClick={handleIdeaClick} />
+    <div className="relative min-h-screen bg-background overflow-hidden">
+      {/* Playful background effects */}
+      <GradientBlob />
+      <FloatingShapes />
+      <SparkleEffect />
+
+      {/* Main content */}
+      <div className="relative z-10">
+        <Header />
+
+        <HeroSection
+          onSendMessage={handleSendMessage}
+          onExploreClick={handleExploreClick}
+        />
+        <div ref={exploreSectionRef}>
+          <ExploreSection ideas={sampleIdeas} onIdeaClick={handleIdeaClick} />
+        </div>
       </div>
+
       <FloatingGlobeButton onClick={handleGlobeClick} />
     </div>
   );
