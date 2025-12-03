@@ -64,8 +64,29 @@ export function ExploreMap() {
       setProgress(100);
       setTimeout(() => setIsLoading(false), 300);
 
-      dummyBmcs.forEach((bmc) => {
-        const marker = new mapboxgl.Marker()
+      dummyBmcs.forEach((bmc, index) => {
+        // Create custom marker element with avatar
+        const el = document.createElement('div');
+        el.className = 'custom-marker';
+        el.style.width = '40px';
+        el.style.height = '40px';
+        el.style.borderRadius = '50%';
+        el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
+        el.style.cursor = 'pointer';
+        el.style.overflow = 'hidden';
+        el.style.backgroundColor = '#e5e7eb';
+
+        // Create avatar image with random seed
+        const img = document.createElement('img');
+        const randomSeed = `${bmc.id || index}-${Date.now()}`;
+        img.src = `https://api.dicebear.com/9.x/open-peeps/svg?backgroundColor=b6e3f4,c0aede,d1d4f9&seed=${encodeURIComponent(randomSeed)}`;
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'cover';
+        img.alt = 'Avatar';
+        el.appendChild(img);
+
+        const marker = new mapboxgl.Marker({ element: el })
           .setLngLat([bmc.coordinates.lon, bmc.coordinates.lat])
           .setPopup(
             new mapboxgl.Popup({ offset: 25 }).setHTML(
