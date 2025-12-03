@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
-import { motion } from 'motion/react';
-import { ChatInput } from './chat-input';
-import type { HeroSectionProps } from '../types';
-import { Button } from '@/features/shared/components/ui/button';
 import { Suggestion, Suggestions } from '@/components/ai-elements/suggestion';
-import { AnimatedBadge } from './animated-badge';
+import { Chat } from '@/features/chat';
+import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
+import { generateUUID } from '@/lib/utils';
+import { motion } from 'motion/react';
+import { useMemo } from 'react';
+import type { HeroSectionProps } from '../types';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -25,14 +25,7 @@ export function HeroSection({
   onSendMessage,
   onExploreClick,
 }: HeroSectionProps) {
-  const [inputValue, setInputValue] = useState('');
-
-  const handleSend = () => {
-    if (inputValue.trim()) {
-      onSendMessage(inputValue);
-      setInputValue('');
-    }
-  };
+  const chatId = useMemo(() => generateUUID(), []);
 
   return (
     <motion.section
@@ -50,10 +43,14 @@ export function HeroSection({
       </motion.h1>
 
       <motion.div className="w-full max-w-2xl" variants={itemVariants}>
-        <ChatInput
-          value={inputValue}
-          onChange={setInputValue}
-          onSend={handleSend}
+        <Chat
+          id={chatId}
+          initialMessages={[]}
+          initialChatModel={DEFAULT_CHAT_MODEL}
+          initialVisibilityType="private"
+          isReadonly={false}
+          autoResume={false}
+          className="flex-1"
         />
       </motion.div>
 
