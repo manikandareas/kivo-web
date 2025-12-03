@@ -9,10 +9,8 @@ import {
   FloatingShapes,
   SparkleEffect,
   GradientBlob,
-  AnimatedBadge,
 } from '@/features/landing';
 import type { Idea } from '@/features/landing';
-import { authClient } from '@/lib/auth-client';
 
 // Sample idea data for initial render
 const sampleIdeas: Idea[] = [
@@ -58,9 +56,6 @@ export default function Home() {
     // TODO: Implement idea selection (e.g., populate chat input or navigate)
     console.log('Idea selected:', idea);
   };
-
-  const { data } = authClient.useSession();
-  console.log(data);
 
   const handleGlobeClick = () => {
     // TODO: Implement globe button action

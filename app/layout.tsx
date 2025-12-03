@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { DM_Sans, Fuzzy_Bubbles } from 'next/font/google';
 import { Toaster } from 'react-hot-toast';
 import './globals.css';
+import { ClerkProvider } from '@clerk/nextjs';
 
 const dmSans = DM_Sans({
   variable: '--font-dm-sans',
@@ -25,13 +26,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${dmSans.variable} ${fuzzyBubbles.variable} antialiased dark`}
-      >
-        <Toaster position="top-center" />
-        {children}
-      </body>
-    </html>
+    <ClerkProvider
+      signInFallbackRedirectUrl={'/'}
+      signUpFallbackRedirectUrl={'/'}
+    >
+      <html lang="en">
+        <body
+          className={`${dmSans.variable} ${fuzzyBubbles.variable} antialiased dark`}
+        >
+          <Toaster position="top-center" />
+          {children}
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
