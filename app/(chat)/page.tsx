@@ -1,16 +1,14 @@
 'use client';
 
-import { useRef } from 'react';
-import {
-  HeroSection,
-  ExploreSection,
-  Header,
-  FloatingGlobeButton,
-  FloatingShapes,
-  SparkleEffect,
-  GradientBlob,
-} from '@/features/landing';
 import type { Idea } from '@/features/landing';
+import {
+  ExploreSection,
+  FloatingGlobeButton,
+  Header,
+  HeroSection,
+} from '@/features/landing';
+import { useRouter } from 'next/navigation';
+import { useRef } from 'react';
 
 // Sample idea data for initial render
 const sampleIdeas: Idea[] = [
@@ -42,6 +40,7 @@ const sampleIdeas: Idea[] = [
 
 export default function Home() {
   const exploreSectionRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   const handleSendMessage = (message: string) => {
     // TODO: Implement message handling (e.g., navigate to chat page or start conversation)
@@ -58,16 +57,15 @@ export default function Home() {
   };
 
   const handleGlobeClick = () => {
-    // TODO: Implement globe button action
-    console.log('Globe button clicked');
+    router.push('/explore');
   };
 
   return (
     <div className="relative min-h-screen bg-background overflow-hidden">
       {/* Playful background effects */}
-      <GradientBlob />
+      {/* <GradientBlob />
       <FloatingShapes />
-      <SparkleEffect />
+      <SparkleEffect /> */}
 
       {/* Main content */}
       <div className="relative z-10">

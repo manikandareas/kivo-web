@@ -12,3 +12,4 @@ export { Checkbox } from './checkbox';
 export { Input } from './input';
 export { Label } from './label';
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs';
+export { Progress } from './progress';
