@@ -262,3 +262,29 @@
   /* temporarily set the background color so we can tell where the map container is positioned */
   background-color: lightgrey;
 }
+
+/* BMC Marker Popup Styles */
+.bmc-popup .mapboxgl-popup-content {
+  padding: 0;
+  background: transparent;
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.bmc-popup .mapboxgl-popup-close-button {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 18px;
+  padding: 8px 12px;
+  right: 0;
+  top: 0;
+  z-index: 10;
+}
+
+.bmc-popup .mapboxgl-popup-close-button:hover {
+  color: rgba(255, 255, 255, 0.9);
+  background: transparent;
+}
+
+.bmc-popup .mapboxgl-popup-tip {
+  border-top-color: rgba(15, 23, 42, 0.95);
+}

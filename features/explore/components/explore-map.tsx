@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Progress } from '@/features/shared/components/ui';
 import { dummyBmcs } from '@/features/shared/constants/dummy-bmc';
+import { createBmcPopupHTML } from './bmc-marker-popup';
 
 export function ExploreMap() {
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -86,13 +87,22 @@ export function ExploreMap() {
         img.alt = 'Avatar';
         el.appendChild(img);
 
+        const popupHTML = createBmcPopupHTML({
+          bmc,
+          avatarSeed: randomSeed,
+        });
+
+        const popup = new mapboxgl.Popup({
+          offset: 25,
+          closeButton: true,
+          closeOnClick: true,
+          maxWidth: '340px',
+          className: 'bmc-popup',
+        }).setHTML(popupHTML);
+
         const marker = new mapboxgl.Marker({ element: el })
           .setLngLat([bmc.coordinates.lon, bmc.coordinates.lat])
-          .setPopup(
-            new mapboxgl.Popup({ offset: 25 }).setHTML(
-              `<strong>${bmc.items.find((i) => i.tag === 'value_propositions')?.content[0] || 'Business'}</strong>`
-            )
-          )
+          .setPopup(popup)
           .addTo(mapRef.current!);
 
         markersRef.current.push(marker);
