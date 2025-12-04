@@ -38,12 +38,17 @@ function PureMessages({
   isReadonly,
 }: MessagesProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const prevMessagesLengthRef = useRef<number>(0);
   // chatId is used in memo comparison to trigger re-render on chat change
   void _chatId;
 
-  // Auto-scroll to bottom when new messages are added
+  // Auto-scroll to bottom when new messages are added (not on initial render)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // Only scroll if messages were actually added (not on initial mount)
+    if (messages.length > prevMessagesLengthRef.current) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+    prevMessagesLengthRef.current = messages.length;
   }, [messages.length]);
 
   const isLoading = status === 'streaming';
