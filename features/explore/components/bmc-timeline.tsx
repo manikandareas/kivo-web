@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { ScrollArea } from '@/features/shared/components/ui';
 import { dummyBmcs, Bmc } from '@/features/shared/constants/dummy-bmc';
 import { cn } from '@/lib/utils';
+import { useSelectedBmc } from '../hooks/use-selected-bmc';
 
 function formatRelativeTime(dateString: string): string {
   const date = new Date(dateString);
@@ -54,16 +55,24 @@ function getBmcSegment(bmc: Bmc): string {
 
 interface BmcTimelineItemProps {
   bmc: Bmc;
+  isSelected: boolean;
+  onSelect: (id: string) => void;
 }
 
-function BmcTimelineItem({ bmc }: BmcTimelineItemProps) {
+function BmcTimelineItem({ bmc, isSelected, onSelect }: BmcTimelineItemProps) {
   const location = getLocationName(bmc.coordinates.lat, bmc.coordinates.lon);
   const title = getBmcTitle(bmc);
   const segment = getBmcSegment(bmc);
   const relativeTime = formatRelativeTime(bmc.createdAt);
 
   return (
-    <div className="flex gap-3 py-3 px-4 hover:bg-white/5 transition-colors rounded-lg">
+    <div
+      className={cn(
+        'flex gap-3 py-3 px-4 hover:bg-white/5 transition-colors rounded-lg cursor-pointer',
+        isSelected && 'bg-blue-500/10 border-l-2 border-blue-500'
+      )}
+      onClick={() => onSelect(bmc.id)}
+    >
       <div className="shrink-0 mt-1">
         <div className="w-8 h-8 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center">
           <svg
@@ -104,6 +113,8 @@ interface BmcTimelineProps {
 }
 
 export function BmcTimeline({ className }: BmcTimelineProps) {
+  const { selectedBmcId, setSelectedBmcId } = useSelectedBmc();
+
   const sortedBmcs = useMemo(() => {
     return [...dummyBmcs].sort(
       (a, b) =>
@@ -121,10 +132,15 @@ export function BmcTimeline({ className }: BmcTimelineProps) {
       <div className="px-4 py-3 border-b border-white/10">
         <h3 className="text-sm font-medium text-white/80">Recent Activity</h3>
       </div>
-      <ScrollArea className="h-[300px]">
+      <ScrollArea className="h-[200px] sm:h-[300px]">
         <div className="py-2">
           {sortedBmcs.map((bmc) => (
-            <BmcTimelineItem key={bmc.id} bmc={bmc} />
+            <BmcTimelineItem
+              key={bmc.id}
+              bmc={bmc}
+              isSelected={selectedBmcId === bmc.id}
+              onSelect={setSelectedBmcId}
+            />
           ))}
         </div>
       </ScrollArea>

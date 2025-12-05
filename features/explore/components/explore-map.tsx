@@ -7,15 +7,17 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Progress } from '@/features/shared/components/ui';
 import { dummyBmcs } from '@/features/shared/constants/dummy-bmc';
 import { createBmcPopupHTML } from './bmc-marker-popup';
+import { useSelectedBmc } from '../hooks/use-selected-bmc';
 
 export function ExploreMap() {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
-  const markersRef = useRef<mapboxgl.Marker[]>([]);
+  const markersRef = useRef<Map<string, mapboxgl.Marker>>(new Map());
   const animationRef = useRef<number | null>(null);
   const isRotatingRef = useRef(true);
   const [isLoading, setIsLoading] = useState(true);
   const [progress, setProgress] = useState(0);
+  const { selectedBmcId, setSelectedBmcId } = useSelectedBmc();
 
   useEffect(() => {
     mapboxgl.accessToken = process.env
@@ -100,12 +102,22 @@ export function ExploreMap() {
           className: 'bmc-popup',
         }).setHTML(popupHTML);
 
+        // Update URL when marker is clicked
+        el.addEventListener('click', () => {
+          setSelectedBmcId(bmc.id);
+        });
+
+        // Clear selection when popup is closed
+        popup.on('close', () => {
+          setSelectedBmcId(null);
+        });
+
         const marker = new mapboxgl.Marker({ element: el })
           .setLngLat([bmc.coordinates.lon, bmc.coordinates.lat])
           .setPopup(popup)
           .addTo(mapRef.current!);
 
-        markersRef.current.push(marker);
+        markersRef.current.set(bmc.id, marker);
       });
 
       animationRef.current = requestAnimationFrame(rotateCamera);
@@ -122,7 +134,34 @@ export function ExploreMap() {
       markers.forEach((marker) => marker.remove());
       mapRef.current?.remove();
     };
-  }, []);
+  }, [setSelectedBmcId]);
+
+  // Open popup when selectedBmcId changes (e.g., from timeline click)
+  useEffect(() => {
+    if (!selectedBmcId || !mapRef.current) return;
+
+    const marker = markersRef.current.get(selectedBmcId);
+    if (!marker) return;
+
+    // Stop rotation and fly to marker
+    isRotatingRef.current = false;
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
+    }
+
+    const lngLat = marker.getLngLat();
+    mapRef.current.flyTo({
+      center: [lngLat.lng, lngLat.lat],
+      zoom: 5,
+      duration: 1500,
+    });
+
+    // Open popup after fly animation
+    setTimeout(() => {
+      marker.togglePopup();
+    }, 1600);
+  }, [selectedBmcId]);
 
   return (
     <div className="w-full h-full relative">
