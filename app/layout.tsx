@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { DM_Sans, Fuzzy_Bubbles } from 'next/font/google';
 import { Toaster } from 'react-hot-toast';
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import './globals.css';
 import { ClerkProvider } from '@clerk/nextjs';
 
@@ -34,8 +35,10 @@ export default function RootLayout({
         <body
           className={`${dmSans.variable} ${fuzzyBubbles.variable} antialiased dark`}
         >
-          <Toaster position="top-center" />
-          {children}
+          <NuqsAdapter>
+            <Toaster position="top-center" />
+            {children}
+          </NuqsAdapter>
         </body>
       </html>
     </ClerkProvider>
