@@ -6,6 +6,7 @@
 export {
   Chat,
   ChatInput,
+  HomeChatForm,
   Message,
   Messages,
   ThinkingMessage,
@@ -15,6 +16,7 @@ export {
   DataStreamContext,
   type ChatProps,
   type ChatInputProps,
+  type HomeChatFormProps,
   type MessageProps,
   type MessagesProps,
   type ChatStatus,

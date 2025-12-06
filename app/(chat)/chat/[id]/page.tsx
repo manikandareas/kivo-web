@@ -1,149 +1,95 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useParams, notFound } from 'next/navigation';
+import { useEffect, useState, useCallback } from 'react';
+import { useParams } from 'next/navigation';
 import { Chat } from '@/features/chat/components/chat';
 import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
-import type {
-  Chat as ChatType,
-  ChatMessage,
-  VisibilityType,
-} from '@/features/chat/types';
+import type { ChatMessage, VisibilityType } from '@/features/chat/types';
 
 /**
- * Chat data with messages
- */
-interface ChatData extends ChatType {
-  messages: ChatMessage[];
-}
-
-/**
- * Fetch chat data by ID
- * In a real implementation, this would call an API endpoint
- */
-async function fetchChatById(id: string): Promise<ChatData | null> {
-  // TODO: Replace with actual API call
-  // For now, return null to simulate not found
-  // In production, this would fetch from your backend
-  console.log('Fetching chat:', id);
-
-  // Simulated API response structure
-  // const response = await fetch(`/api/chat/${id}`);
-  // if (!response.ok) return null;
-  // return response.json();
-
-  return null;
-}
-
-/**
- * Get current user ID from session
- * In a real implementation, this would use auth context
- */
-function getCurrentUserId(): string | null {
-  // TODO: Replace with actual auth implementation
-  // const session = useSession();
-  // return session?.user?.id ?? null;
-  return null;
-}
-
-/**
- * Check if user has access to the chat
- */
-function hasAccess(chat: ChatData, currentUserId: string | null): boolean {
-  // Public chats are accessible to everyone
-  if (chat.visibility === 'public') {
-    return true;
-  }
-
-  // Private chats require matching user ID
-  if (!currentUserId) {
-    return false;
-  }
-
-  return chat.userId === currentUserId;
-}
-
-/**
- * Existing chat page
- * Fetches chat data by ID from URL params
- * Handles not found case
- * Loads and displays previous messages
- * Implements authorization check
+ * Chat detail page
+ * Handles both new chats (from home page redirect) and existing chats
  *
- * Requirements: 4.1, 4.2, 4.3, 4.4, 4.5
+ * Flow:
+ * 1. Check sessionStorage for initial message (from home page)
+ * 2. If found, start new chat with that message
+ * 3. If not found, try to load existing chat from API
  */
-export default function ExistingChatPage() {
+export default function ChatPage() {
   const params = useParams();
   const chatId = params.id as string;
 
-  const [chatData, setChatData] = useState<ChatData | null>(null);
+  const [initialPrompt, setInitialPrompt] = useState<string | null>(null);
+  const [initialMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [hasAccessToChat, setHasAccessToChat] = useState(true);
+  const [isNewChat, setIsNewChat] = useState(false);
 
   useEffect(() => {
-    async function loadChat() {
+    async function initializeChat() {
       setIsLoading(true);
 
-      try {
-        const data = await fetchChatById(chatId);
+      // Check for initial message from home page redirect
+      const storageKey = `chat-initial-${chatId}`;
+      const storedData = sessionStorage.getItem(storageKey);
 
-        if (!data) {
-          // Chat not found
-          setChatData(null);
-          setIsLoading(false);
-          return;
+      if (storedData) {
+        try {
+          const { content, timestamp } = JSON.parse(storedData);
+
+          // Only use if less than 5 minutes old
+          if (Date.now() - timestamp < 5 * 60 * 1000) {
+            setInitialPrompt(content);
+            setIsNewChat(true);
+            setIsLoading(false);
+            return;
+          }
+        } catch (e) {
+          console.error('Failed to parse stored chat data:', e);
         }
 
-        // Check authorization
-        const currentUserId = getCurrentUserId();
-        if (!hasAccess(data, currentUserId)) {
-          // User doesn't have access - show not found for security
-          setHasAccessToChat(false);
-          setChatData(null);
-          setIsLoading(false);
-          return;
-        }
-
-        setChatData(data);
-      } catch (error) {
-        console.error('Failed to load chat:', error);
-        setChatData(null);
-      } finally {
-        setIsLoading(false);
+        // Clean up expired/invalid data
+        sessionStorage.removeItem(storageKey);
       }
+
+      // TODO: Load existing chat from API
+      // For now, treat as new chat if no stored data
+      // const response = await fetch(`/api/chat/${chatId}`);
+      // if (response.ok) {
+      //   const data = await response.json();
+      //   setInitialMessages(data.messages);
+      // }
+
+      setIsNewChat(true);
+      setIsLoading(false);
     }
 
-    loadChat();
+    initializeChat();
   }, [chatId]);
 
-  // Show loading state
+  // Clear sessionStorage after initial prompt is sent
+  const handleInitialPromptSent = useCallback(() => {
+    sessionStorage.removeItem(`chat-initial-${chatId}`);
+  }, [chatId]);
+
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <div className="text-muted-foreground">Loading chat...</div>
+        <div className="text-muted-foreground">Loading...</div>
       </div>
     );
   }
 
-  // Handle not found or unauthorized (security through obscurity)
-  if (!chatData || !hasAccessToChat) {
-    notFound();
-  }
-
-  // Determine if chat is readonly (for public chats viewed by non-owners)
-  const currentUserId = getCurrentUserId();
-  const isReadonly =
-    chatData.visibility === 'public' && chatData.userId !== currentUserId;
-
   return (
     <div className="flex h-screen flex-col">
       <Chat
-        id={chatData.id}
-        initialMessages={chatData.messages}
+        id={chatId}
+        initialMessages={initialMessages}
         initialChatModel={DEFAULT_CHAT_MODEL}
-        initialVisibilityType={chatData.visibility as VisibilityType}
-        isReadonly={isReadonly}
-        autoResume={true}
+        initialVisibilityType={'private' as VisibilityType}
+        isReadonly={false}
+        autoResume={!isNewChat}
+        initialPrompt={initialPrompt ?? undefined}
+        onInitialPromptSent={handleInitialPromptSent}
         className="flex-1"
       />
     </div>

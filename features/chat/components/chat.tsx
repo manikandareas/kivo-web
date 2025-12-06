@@ -13,6 +13,8 @@ import type {
 } from '../types';
 import { Messages, type ChatStatus } from './messages';
 import { ChatInput } from './chat-input';
+import { useAuth, useUser } from '@clerk/nextjs';
+import { DefaultChatTransport } from 'ai';
 
 export interface ChatProps {
   id: string;
@@ -22,12 +24,20 @@ export interface ChatProps {
   isReadonly?: boolean;
   autoResume?: boolean;
   className?: string;
+  /** Initial message to send automatically (from home page redirect) */
+  initialPrompt?: string;
+  /** Callback when initial prompt has been sent */
+  onInitialPromptSent?: () => void;
 }
 
 /**
  * Convert UIMessage parts to ChatMessageWithParts format
  */
-function convertToChatMessageWithParts(msg: UIMessage): ChatMessageWithParts {
+type ChatMessageWithMeta = UIMessage<{ chatId?: string; isNewChat?: boolean }>;
+
+function convertToChatMessageWithParts(
+  msg: ChatMessageWithMeta
+): ChatMessageWithParts {
   const parts: MessagePart[] = [];
 
   for (const part of msg.parts) {
@@ -48,7 +58,7 @@ function convertToChatMessageWithParts(msg: UIMessage): ChatMessageWithParts {
 /**
  * Convert ChatMessage to UIMessage format
  */
-function toUIMessage(msg: ChatMessage): UIMessage {
+function toUIMessage(msg: ChatMessage): ChatMessageWithMeta {
   return {
     id: msg.id,
     role: msg.role as 'user' | 'assistant',
@@ -96,12 +106,16 @@ function PureChat({
   isReadonly = false,
   autoResume = false,
   className,
+  initialPrompt,
+  onInitialPromptSent,
 }: ChatProps) {
   // These props are used for initialization but not directly in render
   void _initialChatModel;
   void _initialVisibilityType;
 
   const router = useRouter();
+
+  const { getToken } = useAuth();
 
   // Local input state for controlled input
   const [input, setInput] = useState('');
@@ -173,17 +187,51 @@ function PureChat({
   );
 
   const { messages, setMessages, status, stop, regenerate, sendMessage } =
-    useChat({
+    useChat<ChatMessageWithMeta>({
       id,
       messages: initialMessages.map(toUIMessage),
-      resume: autoResume,
+      resume: false,
       onError: handleError,
+      onFinish: ({ message }) => {
+        const meta = message.metadata;
+        if (meta?.chatId && meta?.isNewChat && meta.chatId !== id) {
+          router.replace(`/chat/${meta.chatId}`);
+        }
+      },
+      transport: new DefaultChatTransport({
+        api: `${process.env.NEXT_PUBLIC_API_URL}/api/chat/${id}`,
+        credentials: 'include',
+      }),
     });
 
   // Keep sendMessageRef updated with latest sendMessage function
   useEffect(() => {
     sendMessageRef.current = sendMessage;
   }, [sendMessage]);
+
+  // Track if initial prompt has been sent
+  const initialPromptSentRef = useRef(false);
+
+  // Auto-send initial prompt when provided (from home page redirect)
+  useEffect(() => {
+    if (
+      initialPrompt &&
+      !initialPromptSentRef.current &&
+      !isReadonly &&
+      status === 'ready'
+    ) {
+      initialPromptSentRef.current = true;
+
+      // Send the initial message
+      sendMessage({
+        role: 'user',
+        parts: [{ type: 'text', text: initialPrompt }],
+      });
+
+      // Notify parent that initial prompt was sent
+      onInitialPromptSent?.();
+    }
+  }, [initialPrompt, isReadonly, status, sendMessage, onInitialPromptSent]);
 
   // Convert AI SDK UIMessage to ChatMessageWithParts format (preserves reasoning)
   const chatMessages: ChatMessageWithParts[] = messages.map(
