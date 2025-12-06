@@ -58,7 +58,7 @@ export default function Home() {
   }, [markAsAsked]);
 
   return (
-    <div className="flex h-screen flex-col bg-background">
+    <div className="flex h-dvh flex-col bg-background md:h-screen">
       {/* Location Permission Modal */}
       <LocationPermissionModal
         open={shouldShowModal && isSignedIn === true}
@@ -68,11 +68,11 @@ export default function Home() {
       />
 
       {/* Mobile Tab Switcher */}
-      <div className="flex border-b border-border md:hidden">
+      <div className="flex shrink-0 border-b border-border md:hidden">
         <button
           onClick={() => setActiveTab('chat')}
           className={cn(
-            'flex flex-1 items-center justify-center gap-2 py-3 text-sm font-medium transition-colors',
+            'flex flex-1 items-center justify-center gap-2 py-2.5 text-sm font-medium transition-colors active:bg-muted/50',
             activeTab === 'chat'
               ? 'border-b-2 border-primary text-primary'
               : 'text-muted-foreground'
@@ -84,7 +84,7 @@ export default function Home() {
         <button
           onClick={() => setActiveTab('explore')}
           className={cn(
-            'flex flex-1 items-center justify-center gap-2 py-3 text-sm font-medium transition-colors',
+            'flex flex-1 items-center justify-center gap-2 py-2.5 text-sm font-medium transition-colors active:bg-muted/50',
             activeTab === 'explore'
               ? 'border-b-2 border-primary text-primary'
               : 'text-muted-foreground'
@@ -96,7 +96,7 @@ export default function Home() {
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex min-h-0 flex-1 overflow-hidden">
         {/* Left Section - Chat */}
         <div
           className={cn(
@@ -106,24 +106,24 @@ export default function Home() {
           )}
         >
           <Header />
-          <div className="flex flex-1 flex-col items-center justify-center overflow-hidden p-4 md:p-6">
-            <div className="text-center">
-              <h1 className="mb-2 text-2xl font-bold text-foreground md:text-3xl lg:text-4xl">
+          <div className="flex flex-1 flex-col items-center overflow-y-auto overflow-x-hidden px-4 py-6 md:justify-center md:overflow-hidden md:p-6">
+            <div className="w-full max-w-2xl shrink-0 text-center">
+              <h1 className="mb-2 text-xl font-bold text-foreground md:text-3xl lg:text-4xl">
                 Kembangkan
                 <span className="relative mx-0.5 cursor-pointer rounded-sm px-1 underline decoration-primary/80 decoration-wavy decoration-2 underline-offset-[3px] transition-colors hover:bg-primary/20 hover:decoration-primary">
                   Ide mu
                 </span>
               </h1>
-              <p className="mx-auto max-w-md text-sm text-muted-foreground">
+              <p className="mx-auto max-w-[300px] text-sm text-muted-foreground md:max-w-md">
                 Mulai percakapan dengan AI untuk mengembangkan dan memvalidasi
                 ide bisnis Anda
               </p>
             </div>
 
-            <HomeChatForm className="mt-6 w-full max-w-2xl" />
+            <HomeChatForm className="mt-6 w-full max-w-2xl shrink-0" />
 
-            <div className="mt-4">
-              <Suggestions>
+            <div className="-mx-4 mt-5 w-[calc(100%+2rem)] max-w-none shrink-0 px-4 md:mx-0 md:mt-4 md:w-full md:max-w-2xl md:px-0">
+              <Suggestions className="pb-2">
                 <Suggestion
                   key="buildIdea"
                   onClick={
@@ -136,6 +136,7 @@ export default function Home() {
                   }
                   suggestion="Belum punya ide 😪"
                   disabled={!isSignedIn}
+                  className="px-3 text-xs md:px-4 md:text-sm"
                 />
                 <Suggestion
                   key="analyzeMarket"
@@ -149,6 +150,7 @@ export default function Home() {
                   }
                   suggestion="Analisis peluang pasar 🎯"
                   disabled={!isSignedIn}
+                  className="px-3 text-xs md:px-4 md:text-sm"
                 />
                 <Suggestion
                   key="validateIdea"
@@ -162,6 +164,7 @@ export default function Home() {
                   }
                   suggestion="Validasi ide bisnis 🚀"
                   disabled={!isSignedIn}
+                  className="px-3 text-xs md:px-4 md:text-sm"
                 />
               </Suggestions>
             </div>
@@ -182,8 +185,8 @@ export default function Home() {
         >
           <Suspense fallback={null}>
             <ExploreMap />
-            <div className="absolute bottom-4 left-4 right-4 z-10 md:right-auto md:w-80 lg:w-96">
-              <BmcTimeline className="max-h-[35vh] md:max-h-[40vh]" />
+            <div className="absolute bottom-3 left-3 right-3 z-10 md:bottom-4 md:left-4 md:right-auto md:w-80 lg:w-96">
+              <BmcTimeline className="max-h-[30vh] md:max-h-[40vh]" />
             </div>
           </Suspense>
         </div>

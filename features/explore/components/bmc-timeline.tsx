@@ -1,10 +1,16 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { ScrollArea } from '@/features/shared/components/ui';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/features/shared/components/ui/collapsible';
 import { dummyBmcs, Bmc } from '@/features/shared/constants/dummy-bmc';
 import { cn } from '@/lib/utils';
 import { useSelectedBmc } from '../hooks/use-selected-bmc';
+import { ChevronDownIcon } from 'lucide-react';
 
 function formatRelativeTime(dateString: string): string {
   const date = new Date(dateString);
@@ -114,6 +120,7 @@ interface BmcTimelineProps {
 
 export function BmcTimeline({ className }: BmcTimelineProps) {
   const { selectedBmcId, setSelectedBmcId } = useSelectedBmc();
+  const [isOpen, setIsOpen] = useState(false);
 
   const sortedBmcs = useMemo(() => {
     return [...dummyBmcs].sort(
@@ -122,6 +129,21 @@ export function BmcTimeline({ className }: BmcTimelineProps) {
     );
   }, []);
 
+  const timelineContent = (
+    <ScrollArea className="h-[200px] sm:h-[300px]">
+      <div className="py-2">
+        {sortedBmcs.map((bmc) => (
+          <BmcTimelineItem
+            key={bmc.id}
+            bmc={bmc}
+            isSelected={selectedBmcId === bmc.id}
+            onSelect={setSelectedBmcId}
+          />
+        ))}
+      </div>
+    </ScrollArea>
+  );
+
   return (
     <div
       className={cn(
@@ -129,21 +151,27 @@ export function BmcTimeline({ className }: BmcTimelineProps) {
         className
       )}
     >
-      <div className="px-4 py-3 border-b border-white/10">
-        <h3 className="text-sm font-medium text-white/80">Recent Activity</h3>
-      </div>
-      <ScrollArea className="h-[200px] sm:h-[300px]">
-        <div className="py-2">
-          {sortedBmcs.map((bmc) => (
-            <BmcTimelineItem
-              key={bmc.id}
-              bmc={bmc}
-              isSelected={selectedBmcId === bmc.id}
-              onSelect={setSelectedBmcId}
-            />
-          ))}
+      {/* Mobile: Collapsible */}
+      <Collapsible open={isOpen} onOpenChange={setIsOpen} className="sm:hidden">
+        <CollapsibleTrigger className="w-full px-4 py-3 flex items-center justify-between">
+          <h3 className="text-sm font-medium text-white/80">Recent Activity</h3>
+          <ChevronDownIcon
+            className={cn(
+              'w-4 h-4 text-white/60 transition-transform duration-200',
+              isOpen && 'rotate-180'
+            )}
+          />
+        </CollapsibleTrigger>
+        <CollapsibleContent>{timelineContent}</CollapsibleContent>
+      </Collapsible>
+
+      {/* Desktop: Always visible */}
+      <div className="hidden sm:block">
+        <div className="px-4 py-3 border-b border-white/10">
+          <h3 className="text-sm font-medium text-white/80">Recent Activity</h3>
         </div>
-      </ScrollArea>
+        {timelineContent}
+      </div>
     </div>
   );
 }
