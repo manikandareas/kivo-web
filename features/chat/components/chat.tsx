@@ -28,6 +28,8 @@ export interface ChatProps {
   initialPrompt?: string;
   /** Callback when initial prompt has been sent */
   onInitialPromptSent?: () => void;
+  /** Callback when chat stream finishes */
+  onChatFinish?: () => void;
 }
 
 /**
@@ -108,6 +110,7 @@ function PureChat({
   className,
   initialPrompt,
   onInitialPromptSent,
+  onChatFinish,
 }: ChatProps) {
   // These props are used for initialization but not directly in render
   void _initialChatModel;
@@ -197,6 +200,8 @@ function PureChat({
         if (meta?.chatId && meta?.isNewChat && meta.chatId !== id) {
           router.replace(`/chat/${meta.chatId}`);
         }
+        // Notify parent that chat finished
+        onChatFinish?.();
       },
       transport: new DefaultChatTransport({
         api: `${process.env.NEXT_PUBLIC_API_URL}/api/chat/${id}`,

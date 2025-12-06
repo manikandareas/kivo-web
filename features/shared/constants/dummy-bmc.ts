@@ -855,3 +855,71 @@ export const dummyBmcs: Bmc[] = [
     ],
   },
 ];
+
+export const dummyBmc_for_chat = {
+  _id: {
+    $oid: '6933cfe0bdcb900c0e9567a2',
+  },
+  coordinat: {
+    lat: 0,
+    long: 0,
+    alt: 0,
+  },
+  authorId: 'user_36KxgJsnUEJlQuFxLmiO7sdpd91',
+  chatId: 'ed961e9a-8516-4e41-a3f4-4d26a55fbea4',
+  isPublic: false,
+  items: [
+    {
+      tag: 'customer_segments',
+      content:
+        'Mahasiswa usia 18-25 tahun di area kampus dengan daya beli terbatas, mencari tempat nongkrong yang nyaman dan terjangkau. Segmen utama adalah mahasiswa aktif yang gemar bersosialisasi, belajar kelompok, atau sekedar bersantai di antara jadwal kuliah. Karakteristik: budget-conscious, tech-savvy, aktif di media sosial, mencari pengalaman sosial dan produk yang Instagrammable. Kebutuhan utama adalah tempat berkumpul dengan harga terjangkau, WiFi gratis, dan suasana nyaman untuk belajar atau diskusi kelompok.',
+    },
+    {
+      tag: 'value_propositions',
+      content:
+        'Kopi susu kekinian berkualitas dengan harga mahasiswa-friendly 15-25 ribu rupiah, jauh lebih terjangkau dibanding kompetitor premium. Menawarkan tempat nongkrong nyaman dengan WiFi gratis, colokan listrik di setiap meja, dan suasana casual yang cocok untuk belajar atau bersosialisasi. Menu variatif dengan inovasi rasa yang mengikuti tren, porsi yang memuaskan, dan opsi customization. Lokasi strategis di area kampus memudahkan akses tanpa perlu transportasi jauh. Program loyalitas khusus mahasiswa dengan stamp card dan promo rutin di hari-hari tertentu.',
+    },
+    {
+      tag: 'channels',
+      content:
+        'Outlet fisik di lokasi strategis area kampus dengan visibility tinggi dan mudah dijangkau mahasiswa. Media sosial aktif (Instagram, TikTok, WhatsApp Business) untuk promosi, menu update, dan engagement dengan customer. Kerjasama dengan komunitas mahasiswa dan organisasi kampus untuk event sponsorship dan catering. Word-of-mouth marketing melalui program referral dan konten user-generated yang viral. Delivery partnership dengan platform ojek online untuk jangkauan lebih luas ke area kos-kosan dan asrama mahasiswa.',
+    },
+    {
+      tag: 'customer_relationships',
+      content:
+        'Personal assistance di outlet dengan barista ramah yang dapat berinteraksi dan memberikan rekomendasi produk. Self-service ordering system yang efisien untuk mengurangi antrian di jam sibuk. Komunitas online melalui grup WhatsApp dan Instagram untuk info promo eksklusif, feedback, dan engagement. Program loyalitas dengan stamp card digital yang memberikan reward setiap pembelian. Event rutin seperti open mic, study night, atau gathering komunitas untuk membangun sense of belonging. Respon cepat terhadap feedback dan complaint melalui media sosial untuk menunjukkan customer care.',
+    },
+    {
+      tag: 'revenue_streams',
+      content:
+        'Penjualan langsung kopi susu kekinian dengan margin 60-70% per cup, harga jual 15-25 ribu rupiah sebagai produk utama. Penjualan snack ringan seperti pisang goreng, roti bakar, kentang goreng dengan margin 50-60%. Upselling dengan add-ons seperti extra shot, whipped cream, atau topping dengan harga tambahan 3-5 ribu rupiah. Catering untuk event kampus, seminar, atau gathering organisasi mahasiswa dengan paket bundling. Merchandise branded seperti tumbler, tote bag, dan sticker dengan margin tinggi. Future revenue dari membership premium yang memberikan benefit eksklusif seperti free delivery dan priority order.',
+    },
+    {
+      tag: 'key_resources',
+      content:
+        'Lokasi strategis di area kampus dengan sewa terjangkau dan akses mudah bagi mahasiswa. Mesin kopi espresso, grinder, dan peralatan brewing berkualitas untuk konsistensi produk. Barista terlatih dengan skill latte art dan product knowledge yang baik, mampu bekerja cepat di jam ramai. Supplier kopi lokal dan bahan baku dengan harga kompetitif dan kualitas konsisten. Brand identity kuat yang relatable dengan target market mahasiswa, termasuk logo, desain outlet yang instagrammable. Database customer dan sistem loyalitas untuk retention dan personalized marketing.',
+    },
+    {
+      tag: 'key_activities',
+      content:
+        'Produksi kopi dan snack dengan standar kualitas konsisten, recipe development untuk menu baru yang mengikuti tren. Operasional outlet sehari-hari meliputi inventory management, cash flow, dan quality control. Marketing dan promosi aktif di media sosial dengan konten engaging, kolaborasi dengan influencer mahasiswa. Customer service excellence untuk membangun loyalitas dan word-of-mouth positif. Partnership management dengan supplier, komunitas kampus, dan platform delivery. Training barista secara berkala untuk skill improvement dan service excellence. Event organizing untuk community building dan brand awareness di kalangan mahasiswa.',
+    },
+    {
+      tag: 'key_partnerships',
+      content:
+        'Supplier kopi lokal dan distributor bahan baku dengan harga grosir dan sistem payment term yang fleksibel. Vendor snack dan pastry lokal untuk supply produk pendamping dengan konsinyasi atau kerjasama profit sharing. Platform delivery online seperti GoFood dan GrabFood untuk ekspansi channel penjualan tanpa investasi besar. Organisasi mahasiswa, BEM, dan komunitas kampus untuk event sponsorship dan promosi dari mulut ke mulut. Landlord atau pengelola area kampus untuk lokasi strategis dengan sewa kompetitif. Micro-influencer mahasiswa untuk promosi organik dan user-generated content. Bank atau fintech untuk sistem pembayaran digital dan kemungkinan program cashback yang menarik mahasiswa.',
+    },
+    {
+      tag: 'cost_structure',
+      content:
+        'Biaya bahan baku kopi, susu, dan ingredients dengan persentase 25-30% dari revenue sebagai COGS terbesar. Sewa lokasi di area kampus berkisar 15-20% dari revenue tergantung lokasi strategis. Gaji barista dan staff operasional 2-3 orang per shift dengan upah kompetitif untuk retain talent. Utilitas bulanan meliputi listrik, air, gas, dan internet untuk operasional dan WiFi gratis customer. Marketing dan promosi digital termasuk paid ads, konten creator, dan program loyalitas sekitar 5-10% revenue. Maintenance peralatan, supplies operasional seperti cup, sedotan, tissue, dan packaging. Investasi awal untuk setup outlet, peralatan kopi, dan renovasi interior yang instagrammable dengan ROI period 12-18 bulan.',
+    },
+  ],
+  createdAt: {
+    $date: '2025-12-06T06:40:32.113Z',
+  },
+  updatedAt: {
+    $date: '2025-12-06T06:40:32.113Z',
+  },
+  __v: 0,
+};
