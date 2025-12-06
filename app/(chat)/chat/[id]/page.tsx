@@ -10,6 +10,7 @@ import type {
   VisibilityType,
   BmcChatItem,
 } from '@/features/chat/types';
+import { useAuth } from '@clerk/nextjs';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -30,12 +31,16 @@ export default function ChatPage() {
   const [bmcItems, setBmcItems] = useState<BmcChatItem[] | null>(null);
   const [isBmcLoading, setIsBmcLoading] = useState(false);
 
+  const { getToken } = useAuth();
+
   // Fetch BMC data for this chat
   const fetchBmcData = useCallback(async () => {
     setIsBmcLoading(true);
     try {
       const response = await fetch(`${API_URL}/api/bmc/chat/${chatId}`, {
-        credentials: 'include',
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
       });
 
       if (response.ok) {
@@ -87,7 +92,9 @@ export default function ChatPage() {
       // Load existing chat from API
       try {
         const response = await fetch(`${API_URL}/api/chat/${chatId}/messages`, {
-          credentials: 'include',
+          headers: {
+            Authorization: `Bearer ${await getToken()}`,
+          },
         });
         if (response.ok) {
           const result = await response.json();

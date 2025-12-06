@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { MessageSquare, Clock, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useSession } from '@clerk/nextjs';
+import { useAuth, useSession } from '@clerk/nextjs';
 
 interface ChatItem {
   id: string;
@@ -24,6 +24,8 @@ export function ChatHistory({ className }: ChatHistoryProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const { getToken } = useAuth();
+
   useEffect(() => {
     if (!isSignedIn) {
       setIsLoading(false);
@@ -36,7 +38,9 @@ export function ChatHistory({ className }: ChatHistoryProps) {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/chat`,
           {
-            credentials: 'include',
+            headers: {
+              Authorization: `Bearer ${await getToken()}`,
+            },
           }
         );
         const result = await response.json();

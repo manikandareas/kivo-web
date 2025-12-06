@@ -15,6 +15,7 @@ import { Messages, type ChatStatus } from './messages';
 import { ChatInput } from './chat-input';
 import { DefaultChatTransport } from 'ai';
 import { useGeolocation } from '../hooks';
+import { useAuth } from '@clerk/nextjs';
 
 export interface ChatProps {
   id: string;
@@ -119,6 +120,8 @@ function PureChat({
 
   const { coordinates } = useGeolocation();
 
+  const { getToken } = useAuth();
+
   // Local input state for controlled input
   const [input, setInput] = useState('');
 
@@ -193,7 +196,12 @@ function PureChat({
     () =>
       new DefaultChatTransport({
         api: `${process.env.NEXT_PUBLIC_API_URL}/api/chat/${id}`,
-        credentials: 'include',
+        headers: async () => {
+          const token = await getToken();
+          return {
+            Authorization: `Bearer ${token}`,
+          };
+        },
         body: {
           location: coordinates
             ? {
@@ -204,7 +212,7 @@ function PureChat({
             : null,
         },
       }),
-    [id, coordinates]
+    [id, coordinates, getToken]
   );
 
   const { messages, setMessages, status, stop, regenerate, sendMessage } =
