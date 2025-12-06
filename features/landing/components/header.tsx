@@ -1,6 +1,8 @@
-import { UserButton } from '@clerk/nextjs';
+import { buttonVariants } from '@/features/shared';
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import Image from 'next/image';
 import Link from 'next/link';
+import { LogIn } from 'lucide-react';
 
 export function Header() {
   return (
@@ -9,7 +11,21 @@ export function Header() {
         <Link href={'/'}>
           <Image src={'/logo.svg'} width={100} height={40} alt="Kivo" />
         </Link>
-        <UserButton />
+        <SignedIn>
+          <UserButton />
+        </SignedIn>
+        <SignedOut>
+          <Link
+            href={'/sign-in'}
+            className={buttonVariants({
+              className: 'w-fit',
+              size: 'sm',
+              variant: 'ghost',
+            })}
+          >
+            Masuk / Daftar <LogIn />
+          </Link>
+        </SignedOut>
       </div>
     </header>
   );

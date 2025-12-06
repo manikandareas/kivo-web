@@ -125,7 +125,7 @@ export function BmcTimeline({ className }: BmcTimelineProps) {
   return (
     <div
       className={cn(
-        'bg-slate-900/20 backdrop-blur-md border border-white/10 rounded-xl overflow-hidden',
+        'bg-slate-900/40 backdrop-blur-md border border-white/10 rounded-xl overflow-hidden',
         className
       )}
     >

@@ -39,7 +39,7 @@ export function HeroSection({
       data-testid="hero-section"
     >
       <motion.h1
-        className="mb-12 text-center text-4xl font-bold text-foreground md:text-5xl lg:text-6xl font-(family-name:--font-fuzzy-bubbles)"
+        className="mb-12 text-center font-fuzzy-bubbles text-4xl font-bold text-foreground md:text-5xl lg:text-6xl"
         variants={itemVariants}
       >
         Kembangkan Ide mu

@@ -18,7 +18,7 @@ export default function ExplorePage() {
 
       <Suspense fallback={null}>
         <ExploreMap />
-        <div className="absolute bottom-0 left-0 right-0 md:bottom-4 md:left-4 md:right-auto md:w-md z-10 p-2 sm:p-0">
+        <div className="absolute bottom-0 left-0 right-0 z-10 p-2 sm:p-0 md:bottom-4 md:left-4 md:right-auto md:w-80 lg:w-96">
           <BmcTimeline className="max-h-[40vh] md:max-h-none" />
         </div>
       </Suspense>
