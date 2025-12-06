@@ -1,25 +1,19 @@
-'use client';
+import type { Metadata } from 'next';
+import { pageSEO, generateMetadata as genMeta } from '@/lib/seo';
+import { ChatLayoutClient } from './layout-client';
 
-import { DataStreamProvider } from '@/features/chat/components/data-stream-handler';
+export const metadata: Metadata = genMeta(pageSEO.home);
 
 /**
  * Chat layout component
- * Wraps children with DataStreamProvider for streaming state management
- * Applies responsive container styles
+ * Provides SEO metadata and wraps children with client-side providers
  *
- * Requirements: 8.1, 8.2
+ * Requirements: 7.1, 7.2, 7.3
  */
 export default function ChatLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <DataStreamProvider>
-      <div className="flex min-h-screen flex-col bg-background">
-        {/* Main content area with responsive constraints */}
-        <main className="flex flex-1 flex-col">{children}</main>
-      </div>
-    </DataStreamProvider>
-  );
+  return <ChatLayoutClient>{children}</ChatLayoutClient>;
 }

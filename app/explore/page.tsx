@@ -1,8 +1,12 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import { ExploreMap, BmcTimeline } from '@/features/explore';
 import { Button } from '@/features/shared/components/ui';
 import { ChevronLeft } from 'lucide-react';
+import { pageSEO, generateMetadata as genMeta } from '@/lib/seo';
+
+export const metadata: Metadata = genMeta(pageSEO.explore);
 
 export default function ExplorePage() {
   return (

@@ -13,7 +13,6 @@ import type {
 } from '../types';
 import { Messages, type ChatStatus } from './messages';
 import { ChatInput } from './chat-input';
-import { useAuth, useUser } from '@clerk/nextjs';
 import { DefaultChatTransport } from 'ai';
 import { useGeolocation } from '../hooks';
 
@@ -107,7 +106,6 @@ function PureChat({
   initialChatModel: _initialChatModel,
   initialVisibilityType: _initialVisibilityType,
   isReadonly = false,
-  autoResume = false,
   className,
   initialPrompt,
   onInitialPromptSent,

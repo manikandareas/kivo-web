@@ -1,21 +1,5 @@
-// Types
-export type {
-  SignInFormData,
-  SignUpFormData,
-  AuthTabsProps,
-  OAuthProvider,
-} from './types';
+// Auth is now handled by Clerk
+// Custom auth forms have been removed in favor of Clerk's built-in components
 
-// Components
-export {
-  SignInForm,
-  type SignInFormProps,
-  SignUpForm,
-  type SignUpFormProps,
-  OAuthButtons,
-  type OAuthButtonsProps,
-  AuthTabs,
-} from './components';
-
-// Utils
+// Utils - still useful for profile image generation
 export { generateProfileImage } from './utils/profile';
