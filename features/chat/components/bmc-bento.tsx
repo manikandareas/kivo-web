@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/features/shared/components/ui/scroll-area';
+import { ChevronDown } from 'lucide-react';
 import type { BmcChatItem } from '../types/bmc';
 import { BMC_TAG_CONFIG } from '../types/bmc';
 
@@ -18,6 +19,7 @@ interface BmcCardProps {
   onToggle?: () => void;
 }
 
+// Desktop Bento Card
 function BmcCard({ item, className, isExpanded, onToggle }: BmcCardProps) {
   const config = BMC_TAG_CONFIG[item.tag] || {
     label: item.tag,
@@ -38,7 +40,7 @@ function BmcCard({ item, className, isExpanded, onToggle }: BmcCardProps) {
       {/* Header */}
       <div className="mb-2 flex items-center gap-2">
         <span className="text-base">{config.icon}</span>
-        <h3 className="text-xs font-semibold text-foreground truncate">
+        <h3 className="truncate text-xs font-semibold text-foreground">
           {config.label}
         </h3>
       </div>
@@ -55,13 +57,78 @@ function BmcCard({ item, className, isExpanded, onToggle }: BmcCardProps) {
 
       {/* Expand indicator */}
       {!isExpanded && item.content.length > 120 && (
-        <div className="mt-1 text-[9px] text-primary/70 font-medium">
+        <div className="mt-1 text-[9px] font-medium text-primary/70">
           Tap untuk selengkapnya...
         </div>
       )}
     </div>
   );
 }
+
+// Mobile Accordion Item
+function BmcAccordionItem({ item, isExpanded, onToggle }: BmcCardProps) {
+  const config = BMC_TAG_CONFIG[item.tag] || {
+    label: item.tag,
+    icon: '📋',
+    color: 'from-gray-500/20 to-gray-600/10 border-gray-500/30',
+  };
+
+  return (
+    <div
+      className={cn(
+        'overflow-hidden rounded-xl border bg-linear-to-br transition-all duration-300',
+        config.color,
+        isExpanded && 'ring-2 ring-primary/50'
+      )}
+    >
+      {/* Header - Always visible */}
+      <button
+        onClick={onToggle}
+        className="flex w-full items-center justify-between p-4 text-left"
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-xl">{config.icon}</span>
+          <h3 className="text-sm font-semibold text-foreground">
+            {config.label}
+          </h3>
+        </div>
+        <ChevronDown
+          className={cn(
+            'h-5 w-5 text-muted-foreground transition-transform duration-300',
+            isExpanded && 'rotate-180'
+          )}
+        />
+      </button>
+
+      {/* Content - Expandable */}
+      <div
+        className={cn(
+          'grid transition-all duration-300',
+          isExpanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+        )}
+      >
+        <div className="overflow-hidden">
+          <p className="px-4 pb-4 text-sm leading-relaxed text-muted-foreground">
+            {item.content}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Ordered list for mobile accordion view
+const BMC_ORDER = [
+  'value_propositions',
+  'customer_segments',
+  'channels',
+  'customer_relationships',
+  'revenue_streams',
+  'key_resources',
+  'key_activities',
+  'key_partnerships',
+  'cost_structure',
+] as const;
 
 export function BmcBento({ items, className }: BmcBentoProps) {
   const [expandedTag, setExpandedTag] = useState<string | null>(null);
@@ -82,13 +149,18 @@ export function BmcBento({ items, className }: BmcBentoProps) {
   const costStructure = getItemByTag('cost_structure');
   const revenueStreams = getItemByTag('revenue_streams');
 
+  // Get ordered items for mobile view
+  const orderedItems = BMC_ORDER.map((tag) => getItemByTag(tag)).filter(
+    Boolean
+  ) as BmcChatItem[];
+
   return (
     <ScrollArea className={cn('h-full', className)}>
       <div className="p-4">
         {/* Header */}
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold text-foreground">
+            <h2 className="text-base font-bold text-foreground md:text-lg">
               Business Model Canvas
             </h2>
             <p className="text-xs text-muted-foreground">
@@ -100,8 +172,20 @@ export function BmcBento({ items, className }: BmcBentoProps) {
           </div>
         </div>
 
-        {/* BMC Bento Grid */}
-        <div className="grid grid-cols-3 gap-2">
+        {/* Mobile: Accordion List */}
+        <div className="flex flex-col gap-2 md:hidden">
+          {orderedItems.map((item) => (
+            <BmcAccordionItem
+              key={item.tag}
+              item={item}
+              isExpanded={expandedTag === item.tag}
+              onToggle={() => handleToggle(item.tag)}
+            />
+          ))}
+        </div>
+
+        {/* Desktop: BMC Bento Grid */}
+        <div className="hidden md:grid md:grid-cols-3 md:gap-2">
           {/* Row 1: Key Partners (tall) | Key Activities | Value Props (tall) */}
           {keyPartners && (
             <BmcCard

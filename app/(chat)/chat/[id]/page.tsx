@@ -12,9 +12,10 @@ import type {
 } from '@/features/chat/types';
 import { useAuth, UserButton } from '@clerk/nextjs';
 import { Button } from '@/features/shared/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, MessageSquare, LayoutGrid } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -35,6 +36,9 @@ export default function ChatPage() {
   // BMC state
   const [bmcItems, setBmcItems] = useState<BmcChatItem[] | null>(null);
   const [isBmcLoading, setIsBmcLoading] = useState(false);
+
+  // Mobile view toggle: 'chat' or 'bmc'
+  const [mobileView, setMobileView] = useState<'chat' | 'bmc'>('chat');
 
   const { getToken } = useAuth();
 
@@ -65,7 +69,7 @@ export default function ChatPage() {
     } finally {
       setIsBmcLoading(false);
     }
-  }, [chatId]);
+  }, [chatId, getToken]);
 
   useEffect(() => {
     async function initializeChat() {
@@ -141,11 +145,13 @@ export default function ChatPage() {
     );
   }
 
+  const hasBmcData = bmcItems && bmcItems.length > 0;
+
   return (
-    <div className="flex h-screen flex-col">
+    <div className="flex h-dvh flex-col">
       {/* Header */}
-      <header className="flex shrink-0 items-center justify-between border-b bg-background px-4 py-3">
-        <div className="flex items-center gap-3">
+      <header className="flex shrink-0 items-center justify-between border-b bg-background px-3 py-2 sm:px-4 sm:py-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <Button
             variant="ghost"
             size="icon"
@@ -160,17 +166,60 @@ export default function ChatPage() {
               width={80}
               height={32}
               alt="Kivo"
-              className="h-6 w-auto"
+              className="h-5 w-auto sm:h-6"
             />
           </Link>
         </div>
-        <UserButton />
+
+        {/* Mobile View Toggle */}
+        <div className="flex items-center gap-2 lg:hidden">
+          <div className="flex rounded-lg border bg-muted/50 p-0.5">
+            <Button
+              variant={mobileView === 'chat' ? 'secondary' : 'ghost'}
+              size="sm"
+              onClick={() => setMobileView('chat')}
+              className="h-7 gap-1.5 px-2.5 text-xs"
+            >
+              <MessageSquare className="h-3.5 w-3.5" />
+              <span className="hidden xs:inline">Chat</span>
+            </Button>
+            <Button
+              variant={mobileView === 'bmc' ? 'secondary' : 'ghost'}
+              size="sm"
+              onClick={() => setMobileView('bmc')}
+              className={cn(
+                'h-7 gap-1.5 px-2.5 text-xs',
+                hasBmcData && mobileView === 'chat' && 'animate-pulse'
+              )}
+            >
+              <LayoutGrid className="h-3.5 w-3.5" />
+              <span className="hidden xs:inline">BMC</span>
+              {hasBmcData && mobileView === 'chat' && (
+                <span className="flex h-2 w-2 rounded-full bg-primary" />
+              )}
+            </Button>
+          </div>
+          <UserButton />
+        </div>
+
+        {/* Desktop User Button */}
+        <div className="hidden lg:block">
+          <UserButton />
+        </div>
       </header>
 
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Left Section - Chat */}
-        <div className="flex w-1/2 flex-col border-r">
+        {/* Chat Section */}
+        <div
+          className={cn(
+            'flex flex-col',
+            // Mobile: full width, toggle visibility
+            mobileView === 'chat' ? 'flex w-full' : 'hidden',
+            // Desktop: half width, always visible
+            'lg:flex lg:w-1/2 lg:border-r'
+          )}
+        >
           <Chat
             id={chatId}
             initialMessages={initialMessages}
@@ -185,21 +234,29 @@ export default function ChatPage() {
           />
         </div>
 
-        {/* Right Section - BMC Bento */}
-        <div className="w-1/2 overflow-y-auto bg-muted/30 scrollbar-thin">
+        {/* BMC Bento Section */}
+        <div
+          className={cn(
+            'overflow-y-auto bg-muted/30 scrollbar-thin',
+            // Mobile: full width, toggle visibility
+            mobileView === 'bmc' ? 'flex w-full flex-col' : 'hidden',
+            // Desktop: half width, always visible
+            'lg:flex lg:w-1/2 lg:flex-col'
+          )}
+        >
           {isBmcLoading ? (
             <div className="flex h-full items-center justify-center">
               <div className="text-sm text-muted-foreground">
                 Loading BMC data...
               </div>
             </div>
-          ) : bmcItems && bmcItems.length > 0 ? (
+          ) : hasBmcData ? (
             <BmcBento items={bmcItems} />
           ) : (
-            <div className="flex h-full items-center justify-center p-8">
+            <div className="flex h-full items-center justify-center p-6 sm:p-8">
               <div className="text-center">
-                <div className="mb-2 text-4xl">📊</div>
-                <p className="text-sm text-muted-foreground">
+                <div className="mb-2 text-3xl sm:text-4xl">📊</div>
+                <p className="text-xs text-muted-foreground sm:text-sm">
                   Business Model Canvas akan muncul di sini setelah AI
                   menganalisis ide bisnis Anda.
                 </p>
