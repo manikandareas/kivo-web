@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { Chat } from '@/features/chat/components/chat';
 import { BmcBento } from '@/features/chat/components/bmc-bento';
 import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
@@ -10,7 +10,11 @@ import type {
   VisibilityType,
   BmcChatItem,
 } from '@/features/chat/types';
-import { useAuth } from '@clerk/nextjs';
+import { useAuth, UserButton } from '@clerk/nextjs';
+import { Button } from '@/features/shared/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -20,6 +24,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
  */
 export default function ChatPage() {
   const params = useParams();
+  const router = useRouter();
   const chatId = params.id as string;
 
   const [initialPrompt, setInitialPrompt] = useState<string | null>(null);
@@ -116,7 +121,7 @@ export default function ChatPage() {
     initializeChat();
     // Also fetch BMC data on initial load
     fetchBmcData();
-  }, [chatId, fetchBmcData]);
+  }, [chatId, fetchBmcData, getToken]);
 
   // Clear sessionStorage after initial prompt is sent
   const handleInitialPromptSent = useCallback(() => {
@@ -137,44 +142,71 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex h-screen">
-      {/* Left Section - Chat */}
-      <div className="flex w-1/2 flex-col border-r">
-        <Chat
-          id={chatId}
-          initialMessages={initialMessages}
-          initialChatModel={DEFAULT_CHAT_MODEL}
-          initialVisibilityType={'private' as VisibilityType}
-          isReadonly={false}
-          autoResume={!isNewChat}
-          initialPrompt={initialPrompt ?? undefined}
-          onInitialPromptSent={handleInitialPromptSent}
-          onChatFinish={handleChatFinish}
-          className="flex-1"
-        />
-      </div>
+    <div className="flex h-screen flex-col">
+      {/* Header */}
+      <header className="flex shrink-0 items-center justify-between border-b bg-background px-4 py-3">
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.back()}
+            className="h-8 w-8"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <Link href="/">
+            <Image
+              src="/logo.svg"
+              width={80}
+              height={32}
+              alt="Kivo"
+              className="h-6 w-auto"
+            />
+          </Link>
+        </div>
+        <UserButton />
+      </header>
 
-      {/* Right Section - BMC Bento */}
-      <div className="w-1/2 bg-muted/30">
-        {isBmcLoading ? (
-          <div className="flex h-full items-center justify-center">
-            <div className="text-sm text-muted-foreground">
-              Loading BMC data...
+      {/* Main Content */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left Section - Chat */}
+        <div className="flex w-1/2 flex-col border-r">
+          <Chat
+            id={chatId}
+            initialMessages={initialMessages}
+            initialChatModel={DEFAULT_CHAT_MODEL}
+            initialVisibilityType={'private' as VisibilityType}
+            isReadonly={false}
+            autoResume={!isNewChat}
+            initialPrompt={initialPrompt ?? undefined}
+            onInitialPromptSent={handleInitialPromptSent}
+            onChatFinish={handleChatFinish}
+            className="flex-1"
+          />
+        </div>
+
+        {/* Right Section - BMC Bento */}
+        <div className="w-1/2 overflow-y-auto bg-muted/30 scrollbar-thin">
+          {isBmcLoading ? (
+            <div className="flex h-full items-center justify-center">
+              <div className="text-sm text-muted-foreground">
+                Loading BMC data...
+              </div>
             </div>
-          </div>
-        ) : bmcItems && bmcItems.length > 0 ? (
-          <BmcBento items={bmcItems} />
-        ) : (
-          <div className="flex h-full items-center justify-center p-8">
-            <div className="text-center">
-              <div className="mb-2 text-4xl">📊</div>
-              <p className="text-sm text-muted-foreground">
-                Business Model Canvas akan muncul di sini setelah AI
-                menganalisis ide bisnis Anda.
-              </p>
+          ) : bmcItems && bmcItems.length > 0 ? (
+            <BmcBento items={bmcItems} />
+          ) : (
+            <div className="flex h-full items-center justify-center p-8">
+              <div className="text-center">
+                <div className="mb-2 text-4xl">📊</div>
+                <p className="text-sm text-muted-foreground">
+                  Business Model Canvas akan muncul di sini setelah AI
+                  menganalisis ide bisnis Anda.
+                </p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
