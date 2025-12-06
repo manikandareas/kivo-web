@@ -56,3 +56,9 @@ export interface ChatModel {
   name: string;
   provider: string;
 }
+
+/**
+ * BMC (Business Model Canvas) types for chat
+ */
+export type { BmcChatItem, BmcChatData, BmcChatCoordinates } from './types/bmc';
+export { BMC_TAG_CONFIG } from './types/bmc';

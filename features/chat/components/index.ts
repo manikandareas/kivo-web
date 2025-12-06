@@ -19,3 +19,4 @@ export {
   type DataStreamContextValue,
   type StreamData,
 } from './data-stream-handler';
+export { BmcBento } from './bmc-bento';
