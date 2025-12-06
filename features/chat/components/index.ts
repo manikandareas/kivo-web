@@ -20,3 +20,8 @@ export {
   type StreamData,
 } from './data-stream-handler';
 export { BmcBento } from './bmc-bento';
+export { ChatHistory } from './chat-history';
+export {
+  LocationPermissionModal,
+  type LocationPermissionModalProps,
+} from './location-permission-modal';

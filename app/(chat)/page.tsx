@@ -2,7 +2,12 @@
 
 import { BmcTimeline, ExploreMap } from '@/features/explore';
 import { Header } from '@/features/landing';
-import { HomeChatForm } from '@/features/chat/components/home-chat-form';
+import {
+  HomeChatForm,
+  ChatHistory,
+  LocationPermissionModal,
+  useGeolocation,
+} from '@/features/chat';
 import {
   Suggestion,
   Suggestions,
@@ -12,10 +17,18 @@ import { Map, MessageSquare } from 'lucide-react';
 import { Suspense, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { generateUUID } from '@/lib/utils';
+import { useSession } from '@clerk/nextjs';
 
 export default function Home() {
   const router = useRouter();
+  const { isSignedIn } = useSession();
   const [activeTab, setActiveTab] = useState<'chat' | 'explore'>('chat');
+  const {
+    shouldShowModal,
+    getCurrentPosition,
+    markAsAsked,
+    isLoading: isLocationLoading,
+  } = useGeolocation();
 
   // Handle suggestion click - redirect to chat with pre-filled message
   const handleSuggestionClick = useCallback(
@@ -36,8 +49,24 @@ export default function Home() {
     [router]
   );
 
+  const handleAllowLocation = useCallback(() => {
+    getCurrentPosition();
+  }, [getCurrentPosition]);
+
+  const handleSkipLocation = useCallback(() => {
+    markAsAsked();
+  }, [markAsAsked]);
+
   return (
     <div className="flex h-screen flex-col bg-background">
+      {/* Location Permission Modal */}
+      <LocationPermissionModal
+        open={shouldShowModal && isSignedIn === true}
+        onAllow={handleAllowLocation}
+        onSkip={handleSkipLocation}
+        isLoading={isLocationLoading}
+      />
+
       {/* Mobile Tab Switcher */}
       <div className="flex border-b border-border md:hidden">
         <button
@@ -97,27 +126,47 @@ export default function Home() {
               <Suggestions>
                 <Suggestion
                   key="buildIdea"
-                  onClick={() => setActiveTab('explore')}
+                  onClick={
+                    isSignedIn
+                      ? () =>
+                          handleSuggestionClick(
+                            'Bantu aku membangun ide bisnis'
+                          )
+                      : undefined
+                  }
                   suggestion="Belum punya ide 😪"
+                  disabled={!isSignedIn}
                 />
                 <Suggestion
                   key="analyzeMarket"
-                  onClick={() =>
-                    handleSuggestionClick(
-                      'Analisis peluang bisnis di industri teknologi saat ini'
-                    )
+                  onClick={
+                    isSignedIn
+                      ? () =>
+                          handleSuggestionClick(
+                            'Analisis peluang bisnis di industri teknologi saat ini'
+                          )
+                      : undefined
                   }
                   suggestion="Analisis peluang pasar 🎯"
+                  disabled={!isSignedIn}
                 />
                 <Suggestion
                   key="validateIdea"
-                  onClick={() =>
-                    handleSuggestionClick('Bantu validasi ide bisnis saya')
+                  onClick={
+                    isSignedIn
+                      ? () =>
+                          handleSuggestionClick(
+                            'Bantu validasi ide bisnis saya'
+                          )
+                      : undefined
                   }
                   suggestion="Validasi ide bisnis 🚀"
+                  disabled={!isSignedIn}
                 />
               </Suggestions>
             </div>
+
+            <ChatHistory className="mt-8 w-full max-w-2xl" />
           </div>
         </div>
 

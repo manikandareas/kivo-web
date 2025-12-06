@@ -4,7 +4,7 @@ import { useChat, type UIMessage } from '@ai-sdk/react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
-import { memo, useCallback, useState, useRef, useEffect } from 'react';
+import { memo, useCallback, useState, useRef, useEffect, useMemo } from 'react';
 import type {
   ChatMessage,
   ChatMessageWithParts,
@@ -15,6 +15,7 @@ import { Messages, type ChatStatus } from './messages';
 import { ChatInput } from './chat-input';
 import { useAuth, useUser } from '@clerk/nextjs';
 import { DefaultChatTransport } from 'ai';
+import { useGeolocation } from '../hooks';
 
 export interface ChatProps {
   id: string;
@@ -118,7 +119,7 @@ function PureChat({
 
   const router = useRouter();
 
-  const { getToken } = useAuth();
+  const { coordinates } = useGeolocation();
 
   // Local input state for controlled input
   const [input, setInput] = useState('');
@@ -189,6 +190,25 @@ function PureChat({
     [router, retryLastMessage]
   );
 
+  // Memoize transport to update when coordinates change
+  const chatTransport = useMemo(
+    () =>
+      new DefaultChatTransport({
+        api: `${process.env.NEXT_PUBLIC_API_URL}/api/chat/${id}`,
+        credentials: 'include',
+        body: {
+          location: coordinates
+            ? {
+                latitude: coordinates.latitude,
+                longitude: coordinates.longitude,
+                accuracy: coordinates.accuracy,
+              }
+            : null,
+        },
+      }),
+    [id, coordinates]
+  );
+
   const { messages, setMessages, status, stop, regenerate, sendMessage } =
     useChat<ChatMessageWithMeta>({
       id,
@@ -203,10 +223,7 @@ function PureChat({
         // Notify parent that chat finished
         onChatFinish?.();
       },
-      transport: new DefaultChatTransport({
-        api: `${process.env.NEXT_PUBLIC_API_URL}/api/chat/${id}`,
-        credentials: 'include',
-      }),
+      transport: chatTransport,
     });
 
   // Keep sendMessageRef updated with latest sendMessage function

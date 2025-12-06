@@ -6,6 +6,7 @@
 export {
   Chat,
   ChatInput,
+  ChatHistory,
   HomeChatForm,
   Message,
   Messages,
@@ -25,10 +26,12 @@ export {
   type DataStreamState,
   type DataStreamContextValue,
   type StreamData,
+  LocationPermissionModal,
+  type LocationPermissionModalProps,
 } from './components';
 
 // Hooks
-export { useMessages } from './hooks';
+export { useMessages, useGeolocation, type GeolocationState } from './hooks';
 
 // Types
 export type {
