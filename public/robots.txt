@@ -1,0 +1,15 @@
+# Robots.txt for Kivo Web
+# https://www.robotstxt.org/robotstxt.html
+
+User-agent: *
+Allow: /
+Allow: /explore
+
+# Disallow private/auth routes
+Disallow: /sign-in
+Disallow: /sign-up
+Disallow: /chat/
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://kivo.app/sitemap.xml

@@ -30,11 +30,46 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files - NEVER commit real credentials
+# .env.local contains sensitive API keys and secrets
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Keep .env.example for documentation (it has no real credentials)
+!.env.example
 
 # vercel
 .vercel
+
+# Production build artifacts
+/dist
+/.cache
+
+# Sensitive files
+*.key
+*.pem
+*.p12
+*.pfx
+secrets/
+credentials/
+
+# IDE and editor files
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+
+# Logs
+logs/
+*.log
 
 # typescript
 *.tsbuildinfo

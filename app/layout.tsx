@@ -4,6 +4,8 @@ import { Toaster } from 'react-hot-toast';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import './globals.css';
 import { ClerkProvider } from '@clerk/nextjs';
+import { ErrorBoundary } from '@/features/shared/components/error-boundary';
+import { defaultSEO, siteName } from '@/lib/seo';
 
 const dmSans = DM_Sans({
   variable: '--font-dm-sans',
@@ -17,8 +19,35 @@ const fuzzyBubbles = Fuzzy_Bubbles({
 });
 
 export const metadata: Metadata = {
-  title: 'Kivo',
-  description: 'Kivo your AI Business partner',
+  metadataBase: new URL(defaultSEO.url || 'https://kivo.app'),
+  title: {
+    default: defaultSEO.title,
+    template: `%s | ${siteName}`,
+  },
+  description: defaultSEO.description,
+  openGraph: {
+    title: defaultSEO.title,
+    description: defaultSEO.description,
+    url: defaultSEO.url,
+    siteName,
+    images: defaultSEO.image
+      ? [
+          {
+            url: defaultSEO.image,
+            width: 1200,
+            height: 630,
+            alt: defaultSEO.title,
+          },
+        ]
+      : [],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: defaultSEO.title,
+    description: defaultSEO.description,
+    images: defaultSEO.image ? [defaultSEO.image] : [],
+  },
 };
 
 export default function RootLayout({
@@ -37,7 +66,7 @@ export default function RootLayout({
         >
           <NuqsAdapter>
             <Toaster position="top-center" />
-            {children}
+            <ErrorBoundary>{children}</ErrorBoundary>
           </NuqsAdapter>
         </body>
       </html>

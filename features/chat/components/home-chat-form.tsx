@@ -10,7 +10,6 @@ import {
   PromptInputTools,
   PromptInputSubmit,
 } from '@/features/shared/components/ai-elements/prompt-input';
-import { authClient } from '@/lib/auth-client';
 import { Lock } from 'lucide-react';
 import { useSession } from '@clerk/nextjs';
 

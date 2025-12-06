@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { MessageSquare, Clock, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { authClient } from '@/lib/auth-client';
 import { useSession } from '@clerk/nextjs';
 
 interface ChatItem {

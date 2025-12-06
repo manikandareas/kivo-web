@@ -1,4 +1,3 @@
-export { SignInForm, type SignInFormProps } from './sign-in-form';
-export { SignUpForm, type SignUpFormProps } from './sign-up-form';
-export { OAuthButtons, type OAuthButtonsProps } from './oauth-buttons';
-export { AuthTabs } from './auth-tabs';
+// Auth components are now handled by Clerk
+// Custom auth forms have been removed in favor of Clerk's built-in components
+// See app/(auth)/sign-in and app/(auth)/sign-up for Clerk integration
