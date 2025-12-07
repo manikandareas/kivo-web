@@ -5,9 +5,9 @@ import { useEffect, useRef, useState } from 'react';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Progress } from '@/features/shared/components/ui';
-import { dummyBmcs } from '@/features/shared/constants/dummy-bmc';
 import { createBmcPopupHTML } from './bmc-marker-popup';
 import { useSelectedBmc } from '../hooks/use-selected-bmc';
+import { usePublicBmcs } from '../hooks/use-public-bmcs';
 
 export function ExploreMap() {
   const mapRef = useRef<mapboxgl.Map | null>(null);
@@ -15,9 +15,11 @@ export function ExploreMap() {
   const markersRef = useRef<Map<string, mapboxgl.Marker>>(new Map());
   const animationRef = useRef<number | null>(null);
   const isRotatingRef = useRef(true);
+  const currentOpenPopupRef = useRef<mapboxgl.Popup | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [progress, setProgress] = useState(0);
   const { selectedBmcId, setSelectedBmcId } = useSelectedBmc();
+  const { bmcs, isLoading: isBmcsLoading } = usePublicBmcs();
 
   useEffect(() => {
     mapboxgl.accessToken = process.env
@@ -67,59 +69,6 @@ export function ExploreMap() {
       setProgress(100);
       setTimeout(() => setIsLoading(false), 300);
 
-      dummyBmcs.forEach((bmc, index) => {
-        // Create custom marker element with avatar
-        const el = document.createElement('div');
-        el.className = 'custom-marker';
-        el.style.width = '40px';
-        el.style.height = '40px';
-        el.style.borderRadius = '50%';
-        el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
-        el.style.cursor = 'pointer';
-        el.style.overflow = 'hidden';
-        el.style.backgroundColor = '#e5e7eb';
-
-        // Create avatar image with random seed
-        const img = document.createElement('img');
-        const randomSeed = `${bmc.id || index}-${Date.now()}`;
-        img.src = `https://api.dicebear.com/9.x/open-peeps/svg?backgroundColor=b6e3f4,c0aede,d1d4f9&seed=${encodeURIComponent(randomSeed)}`;
-        img.style.width = '100%';
-        img.style.height = '100%';
-        img.style.objectFit = 'cover';
-        img.alt = 'Avatar';
-        el.appendChild(img);
-
-        const popupHTML = createBmcPopupHTML({
-          bmc,
-          avatarSeed: randomSeed,
-        });
-
-        const popup = new mapboxgl.Popup({
-          offset: 25,
-          closeButton: true,
-          closeOnClick: true,
-          maxWidth: '340px',
-          className: 'bmc-popup',
-        }).setHTML(popupHTML);
-
-        // Update URL when marker is clicked
-        el.addEventListener('click', () => {
-          setSelectedBmcId(bmc.id);
-        });
-
-        // Clear selection when popup is closed
-        popup.on('close', () => {
-          setSelectedBmcId(null);
-        });
-
-        const marker = new mapboxgl.Marker({ element: el })
-          .setLngLat([bmc.coordinates.lon, bmc.coordinates.lat])
-          .setPopup(popup)
-          .addTo(mapRef.current!);
-
-        markersRef.current.set(bmc.id, marker);
-      });
-
       animationRef.current = requestAnimationFrame(rotateCamera);
     });
 
@@ -134,7 +83,92 @@ export function ExploreMap() {
       markers.forEach((marker) => marker.remove());
       mapRef.current?.remove();
     };
-  }, [setSelectedBmcId]);
+  }, []);
+
+  // Add markers when BMC data is loaded
+  useEffect(() => {
+    if (!mapRef.current || isBmcsLoading || bmcs.length === 0) return;
+
+    // Clear existing markers
+    markersRef.current.forEach((marker) => marker.remove());
+    markersRef.current.clear();
+
+    // Filter BMCs with valid location
+    const bmcsWithLocation = bmcs.filter(
+      (bmc) => bmc.location && bmc.location.latitude && bmc.location.longitude
+    );
+
+    bmcsWithLocation.forEach((bmc, index) => {
+      if (!bmc.location) return;
+
+      // Create custom marker element with avatar
+      const el = document.createElement('div');
+      el.className = 'custom-marker';
+      el.style.width = '40px';
+      el.style.height = '40px';
+      el.style.borderRadius = '50%';
+      el.style.boxShadow = '0 2px 8px rgba(0,0,0,0.3)';
+      el.style.cursor = 'pointer';
+      el.style.overflow = 'hidden';
+      el.style.backgroundColor = '#e5e7eb';
+
+      // Create avatar image with random seed
+      const img = document.createElement('img');
+      const randomSeed = `${bmc.id || index}`;
+      img.src = `https://api.dicebear.com/9.x/open-peeps/svg?backgroundColor=b6e3f4,c0aede,d1d4f9&seed=${encodeURIComponent(randomSeed)}`;
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.objectFit = 'cover';
+      img.alt = 'Avatar';
+      el.appendChild(img);
+
+      const popupHTML = createBmcPopupHTML({
+        bmc,
+        avatarSeed: randomSeed,
+      });
+
+      const popup = new mapboxgl.Popup({
+        offset: 25,
+        closeButton: true,
+        closeOnClick: true,
+        maxWidth: '340px',
+        className: 'bmc-popup',
+      }).setHTML(popupHTML);
+
+      // Update URL when marker is clicked
+      el.addEventListener('click', () => {
+        // Close currently open popup before opening new one
+        if (
+          currentOpenPopupRef.current &&
+          currentOpenPopupRef.current !== popup
+        ) {
+          currentOpenPopupRef.current.remove();
+        }
+        currentOpenPopupRef.current = popup;
+        setSelectedBmcId(bmc.id);
+      });
+
+      // Track when popup opens
+      popup.on('open', () => {
+        currentOpenPopupRef.current = popup;
+      });
+
+      // Clear selection when popup is closed
+      popup.on('close', () => {
+        if (currentOpenPopupRef.current === popup) {
+          currentOpenPopupRef.current = null;
+        }
+        setSelectedBmcId(null);
+      });
+
+      const marker = new mapboxgl.Marker({ element: el })
+        .setLngLat([bmc.location.longitude, bmc.location.latitude])
+        .setPopup(popup)
+        .addTo(mapRef.current!);
+
+      markersRef.current.set(bmc.id, marker);
+    });
+  }, [bmcs, isBmcsLoading, setSelectedBmcId]);
 
   // Open popup when selectedBmcId changes (e.g., from timeline click)
   useEffect(() => {
@@ -142,6 +176,13 @@ export function ExploreMap() {
 
     const marker = markersRef.current.get(selectedBmcId);
     if (!marker) return;
+
+    const popup = marker.getPopup();
+
+    // Close currently open popup before opening new one
+    if (currentOpenPopupRef.current && currentOpenPopupRef.current !== popup) {
+      currentOpenPopupRef.current.remove();
+    }
 
     // Stop rotation and fly to marker
     isRotatingRef.current = false;
@@ -159,7 +200,10 @@ export function ExploreMap() {
 
     // Open popup after fly animation
     setTimeout(() => {
-      marker.togglePopup();
+      const markerPopup = marker.getPopup();
+      if (markerPopup && !markerPopup.isOpen()) {
+        marker.togglePopup();
+      }
     }, 1600);
   }, [selectedBmcId]);
 

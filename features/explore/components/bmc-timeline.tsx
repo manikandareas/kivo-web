@@ -1,30 +1,22 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { formatDistanceToNow } from 'date-fns';
+import { id } from 'date-fns/locale';
 import { ScrollArea } from '@/features/shared/components/ui';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/features/shared/components/ui/collapsible';
-import { dummyBmcs, Bmc } from '@/features/shared/constants/dummy-bmc';
 import { cn } from '@/lib/utils';
 import { useSelectedBmc } from '../hooks/use-selected-bmc';
+import { usePublicBmcs, ApiBmc } from '../hooks/use-public-bmcs';
 import { ChevronDownIcon } from 'lucide-react';
 
 function formatRelativeTime(dateString: string): string {
   const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
-
-  if (diffMins < 1) return 'just now';
-  if (diffMins < 60) return `${diffMins} minutes ago`;
-  if (diffHours < 24) return `${diffHours} hours ago`;
-  if (diffDays < 7) return `${diffDays} days ago`;
-  return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+  return formatDistanceToNow(date, { addSuffix: true, locale: id });
 }
 
 function getLocationName(lat: number, lon: number): string {
@@ -49,26 +41,22 @@ function getLocationName(lat: number, lon: number): string {
   return 'Indonesia';
 }
 
-function getBmcTitle(bmc: Bmc): string {
+function getBmcTitle(bmc: ApiBmc): string {
   const vp = bmc.items.find((i) => i.tag === 'value_propositions');
-  return vp?.content[0] || 'Business Model Canvas';
-}
-
-function getBmcSegment(bmc: Bmc): string {
-  const cs = bmc.items.find((i) => i.tag === 'customer_segments');
-  return cs?.content[0] || '';
+  return vp?.content.split(',')[0]?.trim() || 'Business Model Canvas';
 }
 
 interface BmcTimelineItemProps {
-  bmc: Bmc;
+  bmc: ApiBmc;
   isSelected: boolean;
   onSelect: (id: string) => void;
 }
 
 function BmcTimelineItem({ bmc, isSelected, onSelect }: BmcTimelineItemProps) {
-  const location = getLocationName(bmc.coordinates.lat, bmc.coordinates.lon);
+  const location = bmc.location
+    ? getLocationName(bmc.location.latitude, bmc.location.longitude)
+    : 'Indonesia';
   const title = getBmcTitle(bmc);
-  const segment = getBmcSegment(bmc);
   const relativeTime = formatRelativeTime(bmc.createdAt);
 
   return (
@@ -98,17 +86,16 @@ function BmcTimelineItem({ bmc, isSelected, onSelect }: BmcTimelineItemProps) {
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="font-medium text-white/90 truncate">{title}</span>
+          <span className="font-medium text-white/90 truncate max-w-xs">
+            {title}
+          </span>
         </div>
         <div className="flex items-center gap-2 mt-1">
           <span className="text-xs px-2 py-0.5 bg-white/10 rounded text-white/70">
             {location}
           </span>
-          {segment && (
-            <span className="text-xs text-white/50 truncate">{segment}</span>
-          )}
+          <div className="text-xs text-white/40 mt-1">{relativeTime}</div>
         </div>
-        <div className="text-xs text-white/40 mt-1">{relativeTime}</div>
       </div>
     </div>
   );
@@ -121,25 +108,40 @@ interface BmcTimelineProps {
 export function BmcTimeline({ className }: BmcTimelineProps) {
   const { selectedBmcId, setSelectedBmcId } = useSelectedBmc();
   const [isOpen, setIsOpen] = useState(false);
+  const { bmcs, isLoading, error } = usePublicBmcs();
 
   const sortedBmcs = useMemo(() => {
-    return [...dummyBmcs].sort(
+    return [...bmcs].sort(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
-  }, []);
+  }, [bmcs]);
 
   const timelineContent = (
     <ScrollArea className="h-[200px] sm:h-[300px]">
       <div className="py-2">
-        {sortedBmcs.map((bmc) => (
-          <BmcTimelineItem
-            key={bmc.id}
-            bmc={bmc}
-            isSelected={selectedBmcId === bmc.id}
-            onSelect={setSelectedBmcId}
-          />
-        ))}
+        {isLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="text-sm text-white/50">Loading...</div>
+          </div>
+        ) : error ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="text-sm text-red-400">{error}</div>
+          </div>
+        ) : sortedBmcs.length === 0 ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="text-sm text-white/50">No BMC data available</div>
+          </div>
+        ) : (
+          sortedBmcs.map((bmc) => (
+            <BmcTimelineItem
+              key={bmc.id}
+              bmc={bmc}
+              isSelected={selectedBmcId === bmc.id}
+              onSelect={setSelectedBmcId}
+            />
+          ))
+        )}
       </div>
     </ScrollArea>
   );

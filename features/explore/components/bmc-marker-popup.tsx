@@ -1,20 +1,12 @@
 'use client';
 
-import { Bmc } from '@/features/shared/constants/dummy-bmc';
+import { formatDistanceToNow } from 'date-fns';
+import { id } from 'date-fns/locale';
+import { ApiBmc } from '../hooks/use-public-bmcs';
 
 function formatRelativeTime(dateString: string): string {
   const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
-
-  if (diffMins < 1) return 'baru saja';
-  if (diffMins < 60) return `${diffMins} menit lalu`;
-  if (diffHours < 24) return `${diffHours} jam lalu`;
-  if (diffDays < 7) return `${diffDays} hari lalu`;
-  return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+  return formatDistanceToNow(date, { addSuffix: true, locale: id });
 }
 
 function getLocationName(lat: number, lon: number): string {
@@ -39,12 +31,13 @@ function getLocationName(lat: number, lon: number): string {
   return 'Indonesia';
 }
 
-function getBmcContent(bmc: Bmc, tag: string): string[] {
-  return bmc.items.find((i) => i.tag === tag)?.content || [];
+// API returns content as string, not array
+function getBmcContent(bmc: ApiBmc, tag: string): string {
+  return bmc.items.find((i) => i.tag === tag)?.content || '';
 }
 
 interface BmcMarkerPopupProps {
-  bmc: Bmc;
+  bmc: ApiBmc;
   avatarSeed: string;
 }
 
@@ -53,12 +46,22 @@ export function createBmcPopupHTML({
   avatarSeed,
 }: BmcMarkerPopupProps): string {
   const title =
-    getBmcContent(bmc, 'value_propositions')[0] || 'Business Model Canvas';
-  const segment = getBmcContent(bmc, 'customer_segments')[0] || '';
-  const location = getLocationName(bmc.coordinates.lat, bmc.coordinates.lon);
+    getBmcContent(bmc, 'value_propositions').split(',')[0]?.trim() ||
+    'Business Model Canvas';
+  const segment =
+    getBmcContent(bmc, 'customer_segments').split(',')[0]?.trim() || '';
+  const location = bmc.location
+    ? getLocationName(bmc.location.latitude, bmc.location.longitude)
+    : 'Indonesia';
   const relativeTime = formatRelativeTime(bmc.createdAt);
-  const channels = getBmcContent(bmc, 'channels');
-  const keyActivities = getBmcContent(bmc, 'key_activities');
+  const channelsStr = getBmcContent(bmc, 'channels');
+  const channels = channelsStr
+    ? channelsStr.split(',').map((c) => c.trim())
+    : [];
+  const keyActivitiesStr = getBmcContent(bmc, 'key_activities');
+  const keyActivities = keyActivitiesStr
+    ? keyActivitiesStr.split(',').map((a) => a.trim())
+    : [];
 
   const avatarUrl = `https://api.dicebear.com/9.x/open-peeps/svg?backgroundColor=b6e3f4,c0aede,d1d4f9&seed=${encodeURIComponent(avatarSeed)}`;
 
