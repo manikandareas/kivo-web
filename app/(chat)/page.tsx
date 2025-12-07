@@ -122,8 +122,8 @@ export default function Home() {
 
             <HomeChatForm className="mt-6 w-full max-w-2xl shrink-0" />
 
-            <div className="-mx-4 mt-5 w-[calc(100%+2rem)] max-w-none shrink-0 px-4 md:mx-0 md:mt-4 md:w-full md:max-w-2xl md:px-0">
-              <Suggestions className="pb-2">
+            <div className="-mx-4 mt-5 w-[calc(100%+2rem)]  max-w-none shrink-0 px-4 md:mx-0 md:mt-4 md:w-full md:max-w-2xl md:px-0">
+              <Suggestions className="pb-2 mx-auto">
                 <Suggestion
                   key="buildIdea"
                   onClick={

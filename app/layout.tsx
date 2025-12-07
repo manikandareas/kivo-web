@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { DM_Sans, Fuzzy_Bubbles } from 'next/font/google';
 import { Toaster } from 'react-hot-toast';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
+import NextTopLoader from 'nextjs-toploader';
 import './globals.css';
 import { ClerkProvider } from '@clerk/nextjs';
 import { ErrorBoundary } from '@/features/shared/components/error-boundary';
@@ -64,6 +65,12 @@ export default function RootLayout({
         <body
           className={`${dmSans.variable} ${fuzzyBubbles.variable} antialiased dark`}
         >
+          <NextTopLoader
+            color="#818CF8"
+            height={3}
+            showSpinner={false}
+            shadow="0 0 10px #818CF8, 0 0 5px #818CF8"
+          />
           <NuqsAdapter>
             <Toaster position="top-center" />
             <ErrorBoundary>{children}</ErrorBoundary>

@@ -153,9 +153,8 @@ export function BmcTimeline({ className }: BmcTimelineProps) {
         className
       )}
     >
-      {/* Mobile: Collapsible */}
-      <Collapsible open={isOpen} onOpenChange={setIsOpen} className="sm:hidden">
-        <CollapsibleTrigger className="w-full px-4 py-3 flex items-center justify-between">
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <CollapsibleTrigger className="w-full px-4 py-3 flex items-center justify-between border-b border-white/10">
           <h3 className="text-sm font-medium text-white/80">Recent Activity</h3>
           <ChevronDownIcon
             className={cn(
@@ -166,14 +165,6 @@ export function BmcTimeline({ className }: BmcTimelineProps) {
         </CollapsibleTrigger>
         <CollapsibleContent>{timelineContent}</CollapsibleContent>
       </Collapsible>
-
-      {/* Desktop: Always visible */}
-      <div className="hidden sm:block">
-        <div className="px-4 py-3 border-b border-white/10">
-          <h3 className="text-sm font-medium text-white/80">Recent Activity</h3>
-        </div>
-        {timelineContent}
-      </div>
     </div>
   );
 }

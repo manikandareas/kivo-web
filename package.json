@@ -45,6 +45,7 @@
     "motion": "^12.23.25",
     "nanoid": "^5.1.6",
     "next": "^16.0.7",
+    "nextjs-toploader": "^3.9.17",
     "nuqs": "^2.8.2",
     "react": "19.2.0",
     "react-dom": "19.2.0",
