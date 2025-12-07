@@ -19,7 +19,7 @@ export interface HomeChatFormProps {
 
 /**
  * Home page chat form component
- * Submits initial message to /api/chat without chatId
+ * Submits initial message to /api/v1/chat without chatId
  * Gets chatId from response and redirects to /chat/:chatId
  */
 export function HomeChatForm({ className }: HomeChatFormProps) {

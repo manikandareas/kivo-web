@@ -195,7 +195,7 @@ function PureChat({
   const chatTransport = useMemo(
     () =>
       new DefaultChatTransport({
-        api: `${process.env.NEXT_PUBLIC_API_URL}/api/chat/${id}`,
+        api: `${process.env.NEXT_PUBLIC_API_URL}/api/v1/chat/${id}`,
         headers: async () => {
           const token = await getToken();
           return {

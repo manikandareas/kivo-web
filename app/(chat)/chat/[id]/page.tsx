@@ -16,6 +16,7 @@ import { ArrowLeft, MessageSquare, LayoutGrid } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { useGeolocation } from '@/features/chat';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -37,6 +38,10 @@ export default function ChatPage() {
   const [bmcItems, setBmcItems] = useState<BmcChatItem[] | null>(null);
   const [isBmcLoading, setIsBmcLoading] = useState(false);
 
+  const { coordinates } = useGeolocation();
+
+  console.log(coordinates);
+
   // Mobile view toggle: 'chat' or 'bmc'
   const [mobileView, setMobileView] = useState<'chat' | 'bmc'>('chat');
 
@@ -46,7 +51,7 @@ export default function ChatPage() {
   const fetchBmcData = useCallback(async () => {
     setIsBmcLoading(true);
     try {
-      const response = await fetch(`${API_URL}/api/bmc/chat/${chatId}`, {
+      const response = await fetch(`${API_URL}/api/v1/bmc/chat/${chatId}`, {
         headers: {
           Authorization: `Bearer ${await getToken()}`,
         },
@@ -100,11 +105,14 @@ export default function ChatPage() {
 
       // Load existing chat from API
       try {
-        const response = await fetch(`${API_URL}/api/chat/${chatId}/messages`, {
-          headers: {
-            Authorization: `Bearer ${await getToken()}`,
-          },
-        });
+        const response = await fetch(
+          `${API_URL}/api/v1/chat/${chatId}/messages`,
+          {
+            headers: {
+              Authorization: `Bearer ${await getToken()}`,
+            },
+          }
+        );
         if (response.ok) {
           const result = await response.json();
           if (result.success && result.data.length > 0) {

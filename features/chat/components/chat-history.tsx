@@ -36,7 +36,7 @@ export function ChatHistory({ className }: ChatHistoryProps) {
       try {
         setIsLoading(true);
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/chat`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/chat`,
           {
             headers: {
               Authorization: `Bearer ${await getToken()}`,
