@@ -10,8 +10,11 @@ import {
   Share2,
   Check,
   AlertCircle,
+  Download,
+  Loader2,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { toPng } from 'html-to-image';
 import { useBmcDetail } from '../hooks/use-bmc-detail';
 import { BMC_TAG_CONFIG } from '@/features/chat/types/bmc';
 import { Button } from '@/features/shared/components/ui/button';
@@ -55,6 +58,30 @@ function getLocationName(lat: number, lon: number): string {
 export function BmcDetailView({ bmcId }: BmcDetailViewProps) {
   const { bmc, isLoading, error } = useBmcDetail(bmcId);
   const [copied, setCopied] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const printRef = useRef<HTMLDivElement>(null);
+
+  const handleDownload = async () => {
+    if (!printRef.current || !bmc) return;
+
+    setIsDownloading(true);
+    try {
+      const dataUrl = await toPng(printRef.current, {
+        quality: 1,
+        pixelRatio: 2,
+        backgroundColor: '#ffffff',
+      });
+
+      const link = document.createElement('a');
+      link.download = `bmc-${bmcId}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error('Failed to download BMC:', err);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   const handleShare = async () => {
     const url = window.location.href;
@@ -142,19 +169,39 @@ export function BmcDetailView({ bmcId }: BmcDetailViewProps) {
               <span className="hidden sm:inline">Kembali</span>
             </Link>
           </Button>
-          <Button variant="outline" size="sm" onClick={handleShare}>
-            {copied ? (
-              <>
-                <Check className="w-4 h-4 mr-2" />
-                Tersalin!
-              </>
-            ) : (
-              <>
-                <Share2 className="w-4 h-4 mr-2" />
-                Bagikan
-              </>
-            )}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDownload}
+              disabled={isDownloading || isLoading || !bmc}
+            >
+              {isDownloading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  <span className="hidden sm:inline">Mengunduh...</span>
+                </>
+              ) : (
+                <>
+                  <Download className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Download</span>
+                </>
+              )}
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleShare}>
+              {copied ? (
+                <>
+                  <Check className="w-4 h-4 mr-2" />
+                  Tersalin!
+                </>
+              ) : (
+                <>
+                  <Share2 className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Bagikan</span>
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -194,6 +241,38 @@ export function BmcDetailView({ bmcId }: BmcDetailViewProps) {
           })}
         </div>
       </main>
+
+      {/* Hidden Printable BMC - Landscape Layout */}
+      <div className="fixed -left-[9999px] top-0">
+        <div
+          ref={printRef}
+          className="w-[1400px] bg-white p-8"
+          style={{ fontFamily: 'system-ui, sans-serif' }}
+        >
+          {/* Print Header */}
+          <div className="mb-6 pb-4 border-b-2 border-gray-200">
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">{title}</h1>
+            <div className="flex items-center gap-4 text-sm text-gray-600">
+              {location && (
+                <span className="flex items-center gap-1">📍 {location}</span>
+              )}
+              {createdDate && (
+                <span className="flex items-center gap-1">
+                  📅 {createdDate}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Print BMC Grid */}
+          <BmcPrintGrid bmc={bmc} />
+
+          {/* Print Footer */}
+          <div className="mt-6 pt-4 border-t border-gray-200 text-center text-xs text-gray-400">
+            Kivo x Imphen x Kolosal AI • Business Model Canvas
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -333,6 +412,181 @@ function BmcDesktopGrid({ bmc }: BmcDesktopGridProps) {
           className="col-span-5"
         />
       )}
+    </div>
+  );
+}
+
+// Print-specific components with inline styles for html-to-image compatibility
+const PRINT_COLORS: Record<string, { bg: string; border: string }> = {
+  key_partnerships: { bg: '#fef3c7', border: '#f59e0b' },
+  key_activities: { bg: '#dbeafe', border: '#3b82f6' },
+  key_resources: { bg: '#dcfce7', border: '#22c55e' },
+  value_propositions: { bg: '#fce7f3', border: '#ec4899' },
+  customer_relationships: { bg: '#e0e7ff', border: '#6366f1' },
+  channels: { bg: '#ffedd5', border: '#f97316' },
+  customer_segments: { bg: '#f3e8ff', border: '#a855f7' },
+  cost_structure: { bg: '#fee2e2', border: '#ef4444' },
+  revenue_streams: { bg: '#d1fae5', border: '#10b981' },
+};
+
+interface BmcPrintCardProps {
+  tag: string;
+  content: string;
+  style?: React.CSSProperties;
+}
+
+function BmcPrintCard({ tag, content, style }: BmcPrintCardProps) {
+  const config = BMC_TAG_CONFIG[tag] || { label: tag, icon: '📋' };
+  const colors = PRINT_COLORS[tag] || { bg: '#f3f4f6', border: '#9ca3af' };
+
+  return (
+    <div
+      style={{
+        backgroundColor: colors.bg,
+        border: `2px solid ${colors.border}`,
+        borderRadius: '12px',
+        padding: '12px',
+        ...style,
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          marginBottom: '8px',
+        }}
+      >
+        <span style={{ fontSize: '18px' }}>{config.icon}</span>
+        <h3
+          style={{
+            fontSize: '13px',
+            fontWeight: 600,
+            color: '#1f2937',
+            margin: 0,
+          }}
+        >
+          {config.label}
+        </h3>
+      </div>
+      <p
+        style={{
+          fontSize: '11px',
+          lineHeight: 1.5,
+          color: '#4b5563',
+          margin: 0,
+          whiteSpace: 'pre-wrap',
+        }}
+      >
+        {content}
+      </p>
+    </div>
+  );
+}
+
+function BmcPrintGrid({ bmc }: BmcDesktopGridProps) {
+  const getItemByTag = (tag: string) =>
+    bmc.items.find((item) => item.tag === tag);
+
+  const keyPartners = getItemByTag('key_partnerships');
+  const keyActivities = getItemByTag('key_activities');
+  const keyResources = getItemByTag('key_resources');
+  const valuePropositions = getItemByTag('value_propositions');
+  const customerRelationships = getItemByTag('customer_relationships');
+  const channels = getItemByTag('channels');
+  const customerSegments = getItemByTag('customer_segments');
+  const costStructure = getItemByTag('cost_structure');
+  const revenueStreams = getItemByTag('revenue_streams');
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      {/* Top Row - 5 columns */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(5, 1fr)',
+          gap: '12px',
+          minHeight: '280px',
+        }}
+      >
+        {/* Key Partners */}
+        {keyPartners && (
+          <BmcPrintCard
+            tag="key_partnerships"
+            content={keyPartners.content}
+            style={{ height: '100%' }}
+          />
+        )}
+
+        {/* Key Activities + Key Resources stacked */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {keyActivities && (
+            <BmcPrintCard
+              tag="key_activities"
+              content={keyActivities.content}
+              style={{ flex: 1 }}
+            />
+          )}
+          {keyResources && (
+            <BmcPrintCard
+              tag="key_resources"
+              content={keyResources.content}
+              style={{ flex: 1 }}
+            />
+          )}
+        </div>
+
+        {/* Value Propositions */}
+        {valuePropositions && (
+          <BmcPrintCard
+            tag="value_propositions"
+            content={valuePropositions.content}
+            style={{ height: '100%' }}
+          />
+        )}
+
+        {/* Customer Relationships + Channels stacked */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {customerRelationships && (
+            <BmcPrintCard
+              tag="customer_relationships"
+              content={customerRelationships.content}
+              style={{ flex: 1 }}
+            />
+          )}
+          {channels && (
+            <BmcPrintCard
+              tag="channels"
+              content={channels.content}
+              style={{ flex: 1 }}
+            />
+          )}
+        </div>
+
+        {/* Customer Segments */}
+        {customerSegments && (
+          <BmcPrintCard
+            tag="customer_segments"
+            content={customerSegments.content}
+            style={{ height: '100%' }}
+          />
+        )}
+      </div>
+
+      {/* Bottom Row - Cost Structure & Revenue Streams */}
+      <div
+        style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}
+      >
+        {costStructure && (
+          <BmcPrintCard tag="cost_structure" content={costStructure.content} />
+        )}
+        {revenueStreams && (
+          <BmcPrintCard
+            tag="revenue_streams"
+            content={revenueStreams.content}
+          />
+        )}
+      </div>
     </div>
   );
 }
