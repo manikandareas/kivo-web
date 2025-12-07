@@ -58,7 +58,7 @@ export function ChatHistory({ className }: ChatHistoryProps) {
     };
 
     fetchChats();
-  }, [isSignedIn]);
+  }, [isSignedIn, getToken]);
 
   const formatRelativeTime = (dateString: string) => {
     const date = new Date(dateString);

@@ -231,19 +231,29 @@ export function createBmcPopupHTML({
           font-size: 10px;
           color: rgba(255, 255, 255, 0.4);
         ">Business Model Canvas</div>
-        <div style="
-          display: flex;
-          align-items: center;
-          gap: 4px;
-          font-size: 11px;
-          color: rgba(59, 130, 246, 0.8);
-          cursor: pointer;
-        ">
+        <a 
+          href="/bmc/${bmc.id}"
+          style="
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: rgba(59, 130, 246, 0.8);
+            cursor: pointer;
+            text-decoration: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: rgba(59, 130, 246, 0.1);
+            transition: background 0.2s;
+          "
+          onmouseover="this.style.background='rgba(59, 130, 246, 0.2)'"
+          onmouseout="this.style.background='rgba(59, 130, 246, 0.1)'"
+        >
           <span>Lihat Detail</span>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M5 12h14M12 5l7 7-7 7"/>
           </svg>
-        </div>
+        </a>
       </div>
     </div>
   `;
